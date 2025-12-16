@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام تقييم المركبات المستردة - متعدد</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .main-header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .main-header h1 {
+            font-size: 1.8rem;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-card .label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        /* Vehicles List */
+        .vehicles-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+        }
+
+        .vehicles-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .vehicle-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .vehicle-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .vehicle-card .form-number {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .vehicle-card .timestamp {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .vehicle-card .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .vehicle-card .info-row .label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .vehicle-card .info-row .value {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .rating-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .rating-excellent {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .rating-good {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .rating-fair {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .rating-poor {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .card-actions button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .card-actions button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 25px;
+        }
+
+        /* Form Section */
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions-bottom {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            min-width: 300px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .notification.show {
+            display: flex;
+        }
+
+        .notification.success {
+            border-left: 5px solid #10b981;
+        }
+
+        .notification.error {
+            border-left: 5px solid #ef4444;
+        }
+
+        .notification.info {
+            border-left: 5px solid #3b82f6;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+            color: #667eea;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 5px 10px;
+        }
+
+        .modal-close:hover {
+            color: #ef4444;
+        }
+
+        .modal-body {
+            line-height: 1.8;
+        }
+
+        .modal-body .detail-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .modal-body .detail-row .label {
+            flex: 0 0 40%;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .modal-body .detail-row .value {
+            flex: 1;
+            color: #111827;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vehicles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-stats {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .main-header h1 {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText"></span>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-eye"></i> تفاصيل المركبة</h3>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="main-header">
+            <h1>
+                <i class="fas fa-car-side"></i>
+                نظام تقييم المركبات المستردة
+            </h1>
+            <div class="header-stats">
+                <div class="stat-card">
+                    <span class="number" id="totalVehicles">0</span>
+                    <span class="label">إجمالي المركبات</span>
+                </div>
+                <div class="stat-card">
+                    <span class="number" id="totalValue">0</span>
+                    <span class="label">القيمة الإجمالية (ر.س)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="showForm()">
+                <i class="fas fa-plus"></i> إضافة مركبة جديدة
+            </button>
+            <button class="btn btn-success" onclick="exportAllToExcel()">
+                <i class="fas fa-file-excel"></i> تصدير الكل إلى Excel
+            </button>
+            <button class="btn btn-warning" onclick="clearAll()">
+                <i class="fas fa-trash-restore"></i> مسح الكل
+            </button>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section" id="formSection">
+            <h2>
+                <i class="fas fa-edit"></i>
+                <span id="formTitle">إضافة مركبة جديدة</span>
+            </h2>
+            <form id="vehicleForm">
+                <input type="hidden" id="editIndex" value="-1">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>رقم العقد | Contract No. *</label>
+                        <input type="text" id="contractNo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الهيكل | VIN *</label>
+                        <input type="text" id="vin" maxlength="17" required>
+                    </div>
+                    <div class="form-group">
+                        <label>اسم العميل | Customer Name *</label>
+                        <input type="text" id="customerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>نوع المركبة | Make *</label>
+                        <input type="text" id="make" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الموديل | Model *</label>
+                        <input type="text" id="model" required>
+                    </div>
+                    <div class="form-group">
+                        <label>سنة الصنع | Year *</label>
+                        <input type="number" id="year" min="1990" max="2030" required>
+                    </div>
+                    <div class="form-group">
+                        <label>رقم اللوحة | Plate No.</label>
+                        <input type="text" id="plateNo">
+                    </div>
+                    <div class="form-group">
+                        <label>قراءة العداد | Odometer (km)</label>
+                        <input type="number" id="odometer">
+                    </div>
+                    <div class="form-group">
+                        <label>اللون | Color</label>
+                        <input type="text" id="color">
+                    </div>
+                    <div class="form-group">
+                        <label>نوع الوقود | Fuel Type</label>
+                        <select id="fuelType">
+                            <option value="">اختر...</option>
+                            <option value="petrol">بنزين | Petrol</option>
+                            <option value="diesel">ديزل | Diesel</option>
+                            <option value="hybrid">هجين | Hybrid</option>
+                            <option value="electric">كهربائي | Electric</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ الاسترداد | Repo Date</label>
+                        <input type="date" id="repoDate">
+                    </div>
+                    <div class="form-group">
+                        <label>موقع الاسترداد | Repo Location</label>
+                        <input type="text" id="repoLocation">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>التقييم الإجمالي | Overall Rating</label>
+                    <select id="overallRating">
+                        <option value="">اختر...</option>
+                        <option value="excellent">ممتاز | Excellent</option>
+                        <option value="good">جيد | Good</option>
+                        <option value="fair">مقبول | Fair</option>
+                        <option value="poor">ضعيف | Poor</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>القيمة السوقية | Market Value (ر.س)</label>
+                    <input type="number" id="marketValue" min="0" step="100">
+                </div>
+
+                <div class="form-group">
+                    <label>التوصية | Recommendation</label>
+                    <select id="recommendation">
+                        <option value="">اختر...</option>
+                        <option value="sell_as_is">البيع كما هي | Sell As-Is</option>
+                        <option value="repair_sell">الإصلاح ثم البيع | Repair & Sell</option>
+                        <option value="auction">البيع في المزاد | Auction</option>
+                        <option value="scrap">التخريد | Scrap</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>ملاحظات | Notes</label>
+                    <textarea id="notes" rows="4"></textarea>
+                </div>
+
+                <div class="form-actions-bottom">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> <span id="saveButtonText">حفظ المركبة</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="hideForm()">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Vehicles List -->
+        <div class="vehicles-section">
+            <h2>
+                <i class="fas fa-list"></i>
+                قائمة المركبات المحفوظة
+            </h2>
+            <div class="vehicles-grid" id="vehiclesGrid">
+                <div class="empty-state">
+                    <i class="fas fa-car-crash"></i>
+                    <h3>لا توجد مركبات محفوظة</h3>
+                    <p>ابدأ بإضافة مركبة جديدة لتظهر هنا</p>
+                    <button class="btn btn-primary" onclick="showForm()">
+                        <i class="fas fa-plus"></i> إضافة مركبة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Variables
+        let vehicles = [];
+        let editingIndex = -1;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadVehicles();
+            updateStats();
+            renderVehicles();
+            
+            // Form submit
+            document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveVehicle();
+            });
+
+            // Set default date
+            document.getElementById('repoDate').value = new Date().toISOString().split('T')[0];
+        });
+
+        // Load vehicles from localStorage
+        function loadVehicles() {
+            const saved = localStorage.getItem('vehicles');
+            if (saved) {
+                try {
+                    vehicles = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Error loading vehicles:', e);
+                    vehicles = [];
+                }
+            }
+        }
+
+        // Save vehicles to localStorage
+        function saveToStorage() {
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalVehicles').textContent = vehicles.length;
+            
+            const totalValue = vehicles.reduce((sum, v) => {
+                return sum + (parseFloat(v.marketValue) || 0);
+            }, 0);
+            
+            document.getElementById('totalValue').textContent = totalValue.toLocaleString('ar-SA');
+        }
+
+        // Render vehicles grid
+        function renderVehicles() {
+            const grid = document.getElementById('vehiclesGrid');
+            
+            if (vehicles.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-car-crash"></i>
+                        <h3>لا توجد مركبات محفوظة</h3>
+                        <p>ابدأ بإضافة مركبة جديدة لتظهر هنا</p>
+                        <button class="btn btn-primary" onclick="showForm()">
+                            <i class="fas fa-plus"></i> إضافة مركبة
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = vehicles.map((vehicle, index) => `
+                <div class="vehicle-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="form-number">${vehicle.contractNo || 'N/A'}</div>
+                            <div class="timestamp">${new Date(vehicle.timestamp).toLocaleString('ar-SA')}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">العميل:</span>
+                        <span class="value">${vehicle.customerName || 'N/A'}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">المركبة:</span>
+                        <span class="value">${vehicle.make || 'N/A'} ${vehicle.model || ''} ${vehicle.year || ''}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">VIN:</span>
+                        <span class="value">${vehicle.vin || 'N/A'}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">القيمة:</span>
+                        <span class="value">${vehicle.marketValue ? parseFloat(vehicle.marketValue).toLocaleString('ar-SA') + ' ر.س' : 'N/A'}</span>
+                    </div>
+                    
+                    ${vehicle.overallRating ? `
+                        <span class="rating-badge rating-${vehicle.overallRating}">
+                            ${getRatingText(vehicle.overallRating)}
+                        </span>
+                    ` : ''}
+                    
+                    <div class="card-actions">
+                        <button class="btn-view" onclick="viewVehicle(${index})">
+                            <i class="fas fa-eye"></i> عرض
+                        </button>
+                        <button class="btn-edit" onclick="editVehicle(${index})">
+                            <i class="fas fa-edit"></i> تعديل
+                        </button>
+                        <button class="btn-delete" onclick="deleteVehicle(${index})">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show form
+        function showForm() {
+            document.getElementById('formSection').classList.add('active');
+            document.getElementById('formTitle').textContent = 'إضافة مركبة جديدة';
+            document.getElementById('saveButtonText').textContent = 'حفظ المركبة';
+            document.getElementById('editIndex').value = '-1';
+            document.getElementById('vehicleForm').reset();
+            document.getElementById('repoDate').value = new Date().toISOString().split('T')[0];
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Hide form
+        function hideForm() {
+            document.getElementById('formSection').classList.remove('active');
+            document.getElementById('vehicleForm').reset();
+            editingIndex = -1;
+        }
+
+        // Save vehicle
+        function saveVehicle() {
+            const vehicle = {
+                contractNo: document.getElementById('contractNo').value,
+                vin: document.getElementById('vin').value,
+                customerName: document.getElementById('customerName').value,
+                make: document.getElementById('make').value,
+                model: document.getElementById('model').value,
+                year: document.getElementById('year').value,
+                plateNo: document.getElementById('plateNo').value,
+                odometer: document.getElementById('odometer').value,
+                color: document.getElementById('color').value,
+                fuelType: document.getElementById('fuelType').value,
+                repoDate: document.getElementById('repoDate').value,
+                repoLocation: document.getElementById('repoLocation').value,
+                overallRating: document.getElementById('overallRating').value,
+                marketValue: document.getElementById('marketValue').value,
+                recommendation: document.getElementById('recommendation').value,
+                notes: document.getElementById('notes').value,
+                timestamp: new Date().toISOString()
+            };
+
+            const editIndex = parseInt(document.getElementById('editIndex').value);
+            
+            if (editIndex >= 0) {
+                // Update existing
+                vehicles[editIndex] = vehicle;
+                showNotification('تم تحديث المركبة بنجاح! | Vehicle updated successfully!', 'success');
+            } else {
+                // Add new
+                vehicles.push(vehicle);
+                showNotification('تم حفظ المركبة بنجاح! | Vehicle saved successfully!', 'success');
+            }
+            
+            saveToStorage();
+            updateStats();
+            renderVehicles();
+            hideForm();
+        }
+
+        // View vehicle details
+        function viewVehicle(index) {
+            const vehicle = vehicles[index];
+            const modal = document.getElementById('viewModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalBody.innerHTML = `
+                <div class="detail-row">
+                    <span class="label">رقم العقد:</span>
+                    <span class="value">${vehicle.contractNo || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">VIN:</span>
+                    <span class="value">${vehicle.vin || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">اسم العميل:</span>
+                    <span class="value">${vehicle.customerName || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">نوع المركبة:</span>
+                    <span class="value">${vehicle.make || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">الموديل:</span>
+                    <span class="value">${vehicle.model || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">السنة:</span>
+                    <span class="value">${vehicle.year || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">رقم اللوحة:</span>
+                    <span class="value">${vehicle.plateNo || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">قراءة العداد:</span>
+                    <span class="value">${vehicle.odometer ? vehicle.odometer + ' كم' : 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">اللون:</span>
+                    <span class="value">${vehicle.color || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">نوع الوقود:</span>
+                    <span class="value">${getFuelTypeText(vehicle.fuelType)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">تاريخ الاسترداد:</span>
+                    <span class="value">${vehicle.repoDate || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">موقع الاسترداد:</span>
+                    <span class="value">${vehicle.repoLocation || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">التقييم العام:</span>
+                    <span class="value">${getRatingText(vehicle.overallRating)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">القيمة السوقية:</span>
+                    <span class="value">${vehicle.marketValue ? parseFloat(vehicle.marketValue).toLocaleString('ar-SA') + ' ر.س' : 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">التوصية:</span>
+                    <span class="value">${getRecommendationText(vehicle.recommendation)}</span>
+                </div>
+                ${vehicle.notes ? `
+                    <div class="detail-row">
+                        <span class="label">ملاحظات:</span>
+                        <span class="value">${vehicle.notes}</span>
+                    </div>
+                ` : ''}
+                <div class="detail-row">
+                    <span class="label">تاريخ الحفظ:</span>
+                    <span class="value">${new Date(vehicle.timestamp).toLocaleString('ar-SA')}</span>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('viewModal').classList.remove('active');
+        }
+
+        // Edit vehicle
+        function editVehicle(index) {
+            const vehicle = vehicles[index];
+            
+            document.getElementById('editIndex').value = index;
+            document.getElementById('formTitle').textContent = 'تعديل بيانات المركبة';
+            document.getElementById('saveButtonText').textContent = 'تحديث المركبة';
+            
+            // Fill form
+            document.getElementById('contractNo').value = vehicle.contractNo || '';
+            document.getElementById('vin').value = vehicle.vin || '';
+            document.getElementById('customerName').value = vehicle.customerName || '';
+            document.getElementById('make').value = vehicle.make || '';
+            document.getElementById('model').value = vehicle.model || '';
+            document.getElementById('year').value = vehicle.year || '';
+            document.getElementById('plateNo').value = vehicle.plateNo || '';
+            document.getElementById('odometer').value = vehicle.odometer || '';
+            document.getElementById('color').value = vehicle.color || '';
+            document.getElementById('fuelType').value = vehicle.fuelType || '';
+            document.getElementById('repoDate').value = vehicle.repoDate || '';
+            document.getElementById('repoLocation').value = vehicle.repoLocation || '';
+            document.getElementById('overallRating').value = vehicle.overallRating || '';
+            document.getElementById('marketValue').value = vehicle.marketValue || '';
+            document.getElementById('recommendation').value = vehicle.recommendation || '';
+            document.getElementById('notes').value = vehicle.notes || '';
+            
+            showForm();
+        }
+
+        // Delete vehicle
+        function deleteVehicle(index) {
+            if (confirm('هل أنت متأكد من حذف هذه المركبة؟\nAre you sure you want to delete this vehicle?')) {
+                vehicles.splice(index, 1);
+                saveToStorage();
+                updateStats();
+                renderVehicles();
+                showNotification('تم حذف المركبة | Vehicle deleted', 'info');
+            }
+        }
+
+        // Clear all vehicles
+        function clearAll() {
+            if (confirm('⚠️ هل أنت متأكد من حذف جميع المركبات؟ لا يمكن التراجع!\n⚠️ Are you sure you want to delete all vehicles? This cannot be undone!')) {
+                if (confirm('تأكيد نهائي: سيتم حذف ' + vehicles.length + ' مركبة!\nFinal confirmation: ' + vehicles.length + ' vehicles will be deleted!')) {
+                    vehicles = [];
+                    saveToStorage();
+                    updateStats();
+                    renderVehicles();
+                    showNotification('تم حذف جميع المركبات | All vehicles deleted', 'warning');
+                }
+            }
+        }
+
+        // Export all to Excel
+        function exportAllToExcel() {
+            if (vehicles.length === 0) {
+                showNotification('لا توجد مركبات للتصدير | No vehicles to export', 'warning');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const wb = XLSX.utils.book_new();
+                
+                // Summary Sheet
+                const summaryData = [
+                    ['REPOSSESSED VEHICLES EVALUATION REPORT'],
+                    ['Generated:', new Date().toLocaleString()],
+                    [''],
+                    ['Total Vehicles:', vehicles.length],
+                    ['Total Value (SAR):', vehicles.reduce((sum, v) => sum + (parseFloat(v.marketValue) || 0), 0).toLocaleString('ar-SA')],
+                    ['Average Value (SAR):', (vehicles.reduce((sum, v) => sum + (parseFloat(v.marketValue) || 0), 0) / vehicles.length).toFixed(2)],
+                    [''],
+                    ['=== STATISTICS ==='],
+                    ['Excellent Rated:', vehicles.filter(v => v.overallRating === 'excellent').length],
+                    ['Good Rated:', vehicles.filter(v => v.overallRating === 'good').length],
+                    ['Fair Rated:', vehicles.filter(v => v.overallRating === 'fair').length],
+                    ['Poor Rated:', vehicles.filter(v => v.overallRating === 'poor').length]
+                ];
+                
+                const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+                wsSummary['!cols'] = [{ wch: 30 }, { wch: 30 }];
+                XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+                
+                // All Vehicles Sheet
+                const allVehiclesData = [
+                    ['Contract No', 'VIN', 'Customer', 'Make', 'Model', 'Year', 'Plate', 'Odometer', 'Color', 
+                     'Fuel Type', 'Repo Date', 'Rating', 'Value (SAR)', 'Recommendation']
+                ];
+                
+                vehicles.forEach(v => {
+                    allVehiclesData.push([
+                        v.contractNo || '',
+                        v.vin || '',
+                        v.customerName || '',
+                        v.make || '',
+                        v.model || '',
+                        v.year || '',
+                        v.plateNo || '',
+                        v.odometer || '',
+                        v.color || '',
+                        getFuelTypeText(v.fuelType),
+                        v.repoDate || '',
+                        getRatingText(v.overallRating),
+                        v.marketValue || '',
+                        getRecommendationText(v.recommendation)
+                    ]);
+                });
+                
+                const wsAll = XLSX.utils.aoa_to_sheet(allVehiclesData);
+                wsAll['!cols'] = Array(14).fill({ wch: 15 });
+                XLSX.utils.book_append_sheet(wb, wsAll, 'All Vehicles');
+                
+                // Individual sheets for each vehicle
+                vehicles.forEach((vehicle, index) => {
+                    const detailData = [
+                        [`VEHICLE #${index + 1} - DETAILED REPORT`],
+                        [''],
+                        ['=== BASIC INFORMATION ==='],
+                        ['Contract Number:', vehicle.contractNo || 'N/A'],
+                        ['VIN:', vehicle.vin || 'N/A'],
+                        ['Customer Name:', vehicle.customerName || 'N/A'],
+                        ['Make:', vehicle.make || 'N/A'],
+                        ['Model:', vehicle.model || 'N/A'],
+                        ['Year:', vehicle.year || 'N/A'],
+                        ['Plate Number:', vehicle.plateNo || 'N/A'],
+                        ['Odometer (km):', vehicle.odometer || 'N/A'],
+                        ['Color:', vehicle.color || 'N/A'],
+                        ['Fuel Type:', getFuelTypeText(vehicle.fuelType)],
+                        ['Repo Date:', vehicle.repoDate || 'N/A'],
+                        ['Repo Location:', vehicle.repoLocation || 'N/A'],
+                        [''],
+                        ['=== EVALUATION ==='],
+                        ['Overall Rating:', getRatingText(vehicle.overallRating)],
+                        ['Market Value (SAR):', vehicle.marketValue || 'N/A'],
+                        ['Recommendation:', getRecommendationText(vehicle.recommendation)],
+                        [''],
+                        ['=== NOTES ==='],
+                        [vehicle.notes || 'No notes'],
+                        [''],
+                        ['Saved At:', new Date(vehicle.timestamp).toLocaleString()]
+                    ];
+                    
+                    const wsDetail = XLSX.utils.aoa_to_sheet(detailData);
+                    wsDetail['!cols'] = [{ wch: 25 }, { wch: 40 }];
+                    
+                    const sheetName = `Vehicle ${index + 1}`.substring(0, 31);
+                    XLSX.utils.book_append_sheet(wb, wsDetail, sheetName);
+                });
+                
+                // Save file
+                const fileName = `All_Vehicles_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                hideLoading();
+                showNotification(`تم تصدير ${vehicles.length} مركبة بنجاح! | ${vehicles.length} vehicles exported successfully!`, 'success');
+                
+            } catch (error) {
+                console.error('Export Error:', error);
+                hideLoading();
+                showNotification('حدث خطأ أثناء التصدير | Export error', 'error');
+            }
+        }
+
+        // Helper functions
+        function getRatingText(value) {
+            const ratings = {
+                'excellent': 'ممتاز | Excellent',
+                'good': 'جيد | Good',
+                'fair': 'مقبول | Fair',
+                'poor': 'ضعيف | Poor'
+            };
+            return ratings[value] || 'N/A';
+        }
+
+        function getRecommendationText(value) {
+            const recommendations = {
+                'sell_as_is': 'البيع كما هي | Sell As-Is',
+                'repair_sell': 'الإصلاح ثم البيع | Repair & Sell',
+                'auction': 'البيع في المزاد | Auction',
+                'scrap': 'التخريد | Scrap'
+            };
+            return recommendations[value] || 'N/A';
+        }
+
+        function getFuelTypeText(value) {
+            const fuelTypes = {
+                'petrol': 'بنزين | Petrol',
+                'diesel': 'ديزل | Diesel',
+                'hybrid': 'هجين | Hybrid',
+                'electric': 'كهربائي | Electric'
+            };
+            return fuelTypes[value] || 'N/A';
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notificationText');
+            
+            text.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        function showLoading() {
+            document.getElementById('loading').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('active');
+        }
+
+        // Close modal on outside click
+        document.getElementById('viewModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
