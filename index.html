@@ -729,14 +729,143 @@
                 <i class="fas fa-plus"></i> إضافة مركبة جديدة
             </button>
             <button class="btn btn-success" onclick="exportAllToExcel()">
-                <i class="fas fa-file-excel"></i> تصدير الكل إلى Excel
+                <i class="fas fa-file-excel"></i> تصدير Excel
             </button>
             <button class="btn btn-secondary" onclick="exportAllPhotosHTML()">
-                <i class="fas fa-images"></i> تصدير جميع الصور
+                <i class="fas fa-images"></i> تصدير الصور
             </button>
             <button class="btn btn-warning" onclick="clearAll()">
                 <i class="fas fa-trash-restore"></i> مسح الكل
             </button>
+        </div>
+
+        <div class="import-export-section">
+            <h3><i class="fas fa-exchange-alt"></i> استيراد وتصدير البيانات الكاملة</h3>
+            <div class="import-export-controls">
+                <button class="btn btn-success" onclick="exportCompleteData()">
+                    <i class="fas fa-download"></i> تصدير البيانات الكاملة (JSON)
+                </button>
+                <div class="file-input-wrapper">
+                    <input type="file" id="importFile" accept=".json" onchange="importCompleteData(event)">
+                    <label for="importFile" class="file-input-label">
+                        <i class="fas fa-upload"></i> استيراد البيانات الكاملة
+                    </label>
+                </div>
+                <button class="btn btn-info" onclick="toggleFilters()">
+                    <i class="fas fa-filter"></i> <span id="filterToggleText">إظهار الفلاتر</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="filter-section" id="filterSection" style="display: none;">
+            <h3><i class="fas fa-filter"></i> تصفية وترتيب المركبات</h3>
+            
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label>البحث | Search</label>
+                    <input type="text" id="searchFilter" placeholder="ابحث برقم العقد، العميل، VIN..." onkeyup="applyFilters()">
+                </div>
+                
+                <div class="filter-group">
+                    <label>نوع المركبة | Make</label>
+                    <select id="makeFilter" onchange="applyFilters()">
+                        <option value="">الكل | All</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>الموديل | Model</label>
+                    <select id="modelFilter" onchange="applyFilters()">
+                        <option value="">الكل | All</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>السنة | Year</label>
+                    <select id="yearFilter" onchange="applyFilters()">
+                        <option value="">الكل | All</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>نوع الوقود | Fuel Type</label>
+                    <select id="fuelFilter" onchange="applyFilters()">
+                        <option value="">الكل | All</option>
+                        <option value="petrol">بنزين | Petrol</option>
+                        <option value="diesel">ديزل | Diesel</option>
+                        <option value="hybrid">هجين | Hybrid</option>
+                        <option value="electric">كهربائي | Electric</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>التقييم | Rating</label>
+                    <select id="ratingFilter" onchange="applyFilters()">
+                        <option value="">الكل | All</option>
+                        <option value="excellent">ممتاز | Excellent</option>
+                        <option value="good">جيد | Good</option>
+                        <option value="fair">مقبول | Fair</option>
+                        <option value="poor">ضعيف | Poor</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>التوصية | Recommendation</label>
+                    <select id="recommendationFilter" onchange="applyFilters()">
+                        <option value="">الكل | All</option>
+                        <option value="sell_as_is">البيع كما هي</option>
+                        <option value="repair_sell">الإصلاح ثم البيع</option>
+                        <option value="auction">المزاد</option>
+                        <option value="scrap">التخريد</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>اللون | Color</label>
+                    <select id="colorFilter" onchange="applyFilters()">
+                        <option value="">الكل | All</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>القيمة من | Value From</label>
+                    <input type="number" id="valueFromFilter" placeholder="0" onchange="applyFilters()">
+                </div>
+                
+                <div class="filter-group">
+                    <label>القيمة إلى | Value To</label>
+                    <input type="number" id="valueToFilter" placeholder="∞" onchange="applyFilters()">
+                </div>
+            </div>
+
+            <div class="sort-section">
+                <label><i class="fas fa-sort"></i> ترتيب حسب | Sort by:</label>
+                <select id="sortBy" onchange="applyFilters()">
+                    <option value="timestamp-desc">الأحدث أولاً | Newest First</option>
+                    <option value="timestamp-asc">الأقدم أولاً | Oldest First</option>
+                    <option value="contractNo-asc">رقم العقد (تصاعدي) | Contract ↑</option>
+                    <option value="contractNo-desc">رقم العقد (تنازلي) | Contract ↓</option>
+                    <option value="customerName-asc">اسم العميل (أ-ي) | Customer A-Z</option>
+                    <option value="customerName-desc">اسم العميل (ي-أ) | Customer Z-A</option>
+                    <option value="make-asc">نوع المركبة (أ-ي) | Make A-Z</option>
+                    <option value="marketValue-desc">القيمة (الأعلى) | Value High-Low</option>
+                    <option value="marketValue-asc">القيمة (الأقل) | Value Low-High</option>
+                    <option value="year-desc">السنة (الأحدث) | Year Newest</option>
+                    <option value="year-asc">السنة (الأقدم) | Year Oldest</option>
+                </select>
+                
+                <div class="results-count" id="resultsCount">
+                    <i class="fas fa-car"></i>
+                    <span>0 مركبة</span>
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="resetFilters()">
+                    <i class="fas fa-redo"></i> إعادة تعيين الفلاتر
+                </button>
+                <div id="activeFilters" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;"></div>
+            </div>
         </div>
 
         <div class="form-section" id="formSection">
@@ -889,11 +1018,14 @@
     <script>
         let vehicles = [];
         let vehiclePhotos = [null, null, null];
+        let filteredVehicles = [];
+        let activeFilters = {};
 
         document.addEventListener('DOMContentLoaded', function() {
             loadVehicles();
             updateStats();
-            renderVehicles();
+            populateFilterOptions();
+            applyFilters();
             
             document.getElementById('vehicleForm').addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -927,6 +1059,298 @@
             }, 0);
             
             document.getElementById('totalValue').textContent = totalValue.toLocaleString('ar-SA');
+        }
+
+        function populateFilterOptions() {
+            // Get unique values
+            const makes = [...new Set(vehicles.map(v => v.make).filter(Boolean))].sort();
+            const models = [...new Set(vehicles.map(v => v.model).filter(Boolean))].sort();
+            const years = [...new Set(vehicles.map(v => v.year).filter(Boolean))].sort((a, b) => b - a);
+            const colors = [...new Set(vehicles.map(v => v.color).filter(Boolean))].sort();
+
+            // Populate dropdowns
+            const makeFilter = document.getElementById('makeFilter');
+            makeFilter.innerHTML = '<option value="">الكل | All</option>' + 
+                makes.map(m => `<option value="${m}">${m}</option>`).join('');
+
+            const modelFilter = document.getElementById('modelFilter');
+            modelFilter.innerHTML = '<option value="">الكل | All</option>' + 
+                models.map(m => `<option value="${m}">${m}</option>`).join('');
+
+            const yearFilter = document.getElementById('yearFilter');
+            yearFilter.innerHTML = '<option value="">الكل | All</option>' + 
+                years.map(y => `<option value="${y}">${y}</option>`).join('');
+
+            const colorFilter = document.getElementById('colorFilter');
+            colorFilter.innerHTML = '<option value="">الكل | All</option>' + 
+                colors.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        function toggleFilters() {
+            const filterSection = document.getElementById('filterSection');
+            const toggleText = document.getElementById('filterToggleText');
+            
+            if (filterSection.style.display === 'none') {
+                filterSection.style.display = 'block';
+                toggleText.textContent = 'إخفاء الفلاتر';
+            } else {
+                filterSection.style.display = 'none';
+                toggleText.textContent = 'إظهار الفلاتر';
+            }
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchFilter').value.toLowerCase();
+            const makeFilter = document.getElementById('makeFilter').value;
+            const modelFilter = document.getElementById('modelFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+            const fuelFilter = document.getElementById('fuelFilter').value;
+            const ratingFilter = document.getElementById('ratingFilter').value;
+            const recommendationFilter = document.getElementById('recommendationFilter').value;
+            const colorFilter = document.getElementById('colorFilter').value;
+            const valueFrom = parseFloat(document.getElementById('valueFromFilter').value) || 0;
+            const valueTo = parseFloat(document.getElementById('valueToFilter').value) || Infinity;
+            const sortBy = document.getElementById('sortBy').value;
+
+            // Filter vehicles
+            filteredVehicles = vehicles.filter(vehicle => {
+                // Search filter
+                if (searchTerm) {
+                    const searchableText = `${vehicle.contractNo} ${vehicle.customerName} ${vehicle.vin} ${vehicle.make} ${vehicle.model}`.toLowerCase();
+                    if (!searchableText.includes(searchTerm)) return false;
+                }
+
+                // Other filters
+                if (makeFilter && vehicle.make !== makeFilter) return false;
+                if (modelFilter && vehicle.model !== modelFilter) return false;
+                if (yearFilter && vehicle.year !== yearFilter) return false;
+                if (fuelFilter && vehicle.fuelType !== fuelFilter) return false;
+                if (ratingFilter && vehicle.overallRating !== ratingFilter) return false;
+                if (recommendationFilter && vehicle.recommendation !== recommendationFilter) return false;
+                if (colorFilter && vehicle.color !== colorFilter) return false;
+
+                // Value range filter
+                const value = parseFloat(vehicle.marketValue) || 0;
+                if (value < valueFrom || value > valueTo) return false;
+
+                return true;
+            });
+
+            // Sort vehicles
+            const [sortField, sortOrder] = sortBy.split('-');
+            filteredVehicles.sort((a, b) => {
+                let aVal = a[sortField];
+                let bVal = b[sortField];
+
+                // Handle different data types
+                if (sortField === 'marketValue') {
+                    aVal = parseFloat(aVal) || 0;
+                    bVal = parseFloat(bVal) || 0;
+                } else if (sortField === 'year') {
+                    aVal = parseInt(aVal) || 0;
+                    bVal = parseInt(bVal) || 0;
+                } else if (sortField === 'timestamp') {
+                    aVal = new Date(aVal).getTime();
+                    bVal = new Date(bVal).getTime();
+                } else {
+                    aVal = String(aVal || '').toLowerCase();
+                    bVal = String(bVal || '').toLowerCase();
+                }
+
+                if (sortOrder === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            // Update active filters display
+            updateActiveFilters();
+
+            // Update results count
+            document.getElementById('resultsCount').innerHTML = `
+                <i class="fas fa-car"></i>
+                <span>${filteredVehicles.length} مركبة</span>
+            `;
+
+            // Render filtered vehicles
+            renderVehicles();
+        }
+
+        function updateActiveFilters() {
+            const activeFiltersDiv = document.getElementById('activeFilters');
+            const filters = [];
+
+            if (document.getElementById('searchFilter').value) {
+                filters.push({ label: 'بحث: ' + document.getElementById('searchFilter').value, id: 'searchFilter' });
+            }
+            if (document.getElementById('makeFilter').value) {
+                filters.push({ label: 'نوع: ' + document.getElementById('makeFilter').value, id: 'makeFilter' });
+            }
+            if (document.getElementById('modelFilter').value) {
+                filters.push({ label: 'موديل: ' + document.getElementById('modelFilter').value, id: 'modelFilter' });
+            }
+            if (document.getElementById('yearFilter').value) {
+                filters.push({ label: 'سنة: ' + document.getElementById('yearFilter').value, id: 'yearFilter' });
+            }
+            if (document.getElementById('fuelFilter').value) {
+                filters.push({ label: 'وقود: ' + getFuelTypeText(document.getElementById('fuelFilter').value), id: 'fuelFilter' });
+            }
+            if (document.getElementById('ratingFilter').value) {
+                filters.push({ label: 'تقييم: ' + getRatingText(document.getElementById('ratingFilter').value), id: 'ratingFilter' });
+            }
+            if (document.getElementById('recommendationFilter').value) {
+                filters.push({ label: 'توصية: ' + getRecommendationText(document.getElementById('recommendationFilter').value), id: 'recommendationFilter' });
+            }
+            if (document.getElementById('colorFilter').value) {
+                filters.push({ label: 'لون: ' + document.getElementById('colorFilter').value, id: 'colorFilter' });
+            }
+            if (document.getElementById('valueFromFilter').value || document.getElementById('valueToFilter').value) {
+                const from = document.getElementById('valueFromFilter').value || '0';
+                const to = document.getElementById('valueToFilter').value || '∞';
+                filters.push({ label: `قيمة: ${from} - ${to}`, id: 'valueRange' });
+            }
+
+            if (filters.length > 0) {
+                activeFiltersDiv.innerHTML = filters.map(f => `
+                    <span class="filter-badge">
+                        ${f.label}
+                        <button onclick="removeFilter('${f.id}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </span>
+                `).join('');
+            } else {
+                activeFiltersDiv.innerHTML = '';
+            }
+        }
+
+        function removeFilter(filterId) {
+            if (filterId === 'valueRange') {
+                document.getElementById('valueFromFilter').value = '';
+                document.getElementById('valueToFilter').value = '';
+            } else {
+                document.getElementById(filterId).value = '';
+            }
+            applyFilters();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchFilter').value = '';
+            document.getElementById('makeFilter').value = '';
+            document.getElementById('modelFilter').value = '';
+            document.getElementById('yearFilter').value = '';
+            document.getElementById('fuelFilter').value = '';
+            document.getElementById('ratingFilter').value = '';
+            document.getElementById('recommendationFilter').value = '';
+            document.getElementById('colorFilter').value = '';
+            document.getElementById('valueFromFilter').value = '';
+            document.getElementById('valueToFilter').value = '';
+            document.getElementById('sortBy').value = 'timestamp-desc';
+            applyFilters();
+        }
+
+        function exportCompleteData() {
+            if (vehicles.length === 0) {
+                showNotification('لا توجد بيانات للتصدير', 'warning');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const exportData = {
+                    version: '2.0',
+                    exportDate: new Date().toISOString(),
+                    totalVehicles: vehicles.length,
+                    vehicles: vehicles
+                };
+
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `Complete_Vehicle_Data_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                hideLoading();
+                showNotification(`تم تصدير ${vehicles.length} مركبة بالصور بنجاح!`, 'success');
+
+            } catch (error) {
+                console.error('Export Error:', error);
+                hideLoading();
+                showNotification('حدث خطأ أثناء التصدير', 'error');
+            }
+        }
+
+        function importCompleteData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showLoading();
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importData = JSON.parse(e.target.result);
+                    
+                    if (!importData.vehicles || !Array.isArray(importData.vehicles)) {
+                        throw new Error('Invalid data format');
+                    }
+
+                    // Ask user what to do with existing data
+                    let shouldMerge = false;
+                    if (vehicles.length > 0) {
+                        const choice = confirm(
+                            `يوجد ${vehicles.length} مركبة حالياً.\n\n` +
+                            `اضغط "موافق" للدمج مع البيانات الحالية\n` +
+                            `اضغط "إلغاء" لاستبدال البيانات الحالية\n\n` +
+                            `Current: ${vehicles.length} vehicles\n` +
+                            `"OK" to merge | "Cancel" to replace`
+                        );
+                        shouldMerge = choice;
+                    }
+
+                    if (shouldMerge) {
+                        vehicles = [...vehicles, ...importData.vehicles];
+                    } else {
+                        vehicles = importData.vehicles;
+                    }
+
+                    saveToStorage();
+                    updateStats();
+                    populateFilterOptions();
+                    applyFilters();
+
+                    hideLoading();
+                    showNotification(
+                        `تم استيراد ${importData.vehicles.length} مركبة بنجاح!${shouldMerge ? ' (دمج)' : ' (استبدال)'}`,
+                        'success'
+                    );
+
+                    // Reset file input
+                    event.target.value = '';
+
+                } catch (error) {
+                    console.error('Import Error:', error);
+                    hideLoading();
+                    showNotification('خطأ في قراءة الملف. تأكد من صحة الملف', 'error');
+                    event.target.value = '';
+                }
+            };
+
+            reader.onerror = function() {
+                hideLoading();
+                showNotification('فشل قراءة الملف', 'error');
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
         }
 
         function handlePhotoUpload(index, event) {
@@ -967,13 +1391,14 @@
 
         function renderVehicles() {
             const grid = document.getElementById('vehiclesGrid');
+            const vehiclesToRender = filteredVehicles.length > 0 || Object.keys(activeFilters).length > 0 ? filteredVehicles : vehicles;
             
             if (vehicles.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-car-crash"></i>
                         <h3>لا توجد مركبات محفوظة</h3>
-                        <p>ابدأ بإضافة مركبة جديدة لتظهر هنا</p>
+                        <p>ابدأ بإضافة مركبة جديدة أو استيراد بيانات موجودة</p>
                         <button class="btn btn-primary" onclick="showForm()">
                             <i class="fas fa-plus"></i> إضافة مركبة
                         </button>
@@ -982,7 +1407,23 @@
                 return;
             }
 
-            grid.innerHTML = vehicles.map((vehicle, index) => `
+            if (vehiclesToRender.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-filter"></i>
+                        <h3>لا توجد نتائج</h3>
+                        <p>لم يتم العثور على مركبات تطابق معايير البحث</p>
+                        <button class="btn btn-secondary" onclick="resetFilters()">
+                            <i class="fas fa-redo"></i> إعادة تعيين الفلاتر
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = vehiclesToRender.map((vehicle, index) => {
+                const actualIndex = vehicles.indexOf(vehicle);
+                return `
                 <div class="vehicle-card">
                     <div class="card-header">
                         <div>
@@ -1026,26 +1467,27 @@
                     ` : ''}
                     
                     <div class="card-actions">
-                        <button class="btn-view" onclick="viewVehicle(${index})">
+                        <button class="btn-view" onclick="viewVehicle(${actualIndex})">
                             <i class="fas fa-eye"></i> عرض
                         </button>
-                        <button class="btn-pdf" onclick="exportVehicleToPDF(${index})">
+                        <button class="btn-pdf" onclick="exportVehicleToPDF(${actualIndex})">
                             <i class="fas fa-file-pdf"></i> PDF
                         </button>
                         ${vehicle.photos && vehicle.photos.length > 0 ? `
-                            <button class="btn-secondary" onclick="exportVehiclePhotos(${index})" style="background: #8b5cf6; color: white;">
+                            <button class="btn-secondary" onclick="exportVehiclePhotos(${actualIndex})" style="background: #8b5cf6; color: white;">
                                 <i class="fas fa-images"></i> صور
                             </button>
                         ` : ''}
-                        <button class="btn-edit" onclick="editVehicle(${index})">
+                        <button class="btn-edit" onclick="editVehicle(${actualIndex})">
                             <i class="fas fa-edit"></i> تعديل
                         </button>
-                        <button class="btn-delete" onclick="deleteVehicle(${index})">
+                        <button class="btn-delete" onclick="deleteVehicle(${actualIndex})">
                             <i class="fas fa-trash"></i> حذف
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function showForm() {
@@ -1102,7 +1544,8 @@
             
             saveToStorage();
             updateStats();
-            renderVehicles();
+            populateFilterOptions();
+            applyFilters();
             hideForm();
         }
 
@@ -1242,7 +1685,8 @@
                 vehicles.splice(index, 1);
                 saveToStorage();
                 updateStats();
-                renderVehicles();
+                populateFilterOptions();
+                applyFilters();
                 showNotification('تم حذف المركبة', 'info');
             }
         }
@@ -1251,9 +1695,11 @@
             if (confirm('⚠️ هل أنت متأكد من حذف جميع المركبات؟ لا يمكن التراجع!')) {
                 if (confirm('تأكيد نهائي: سيتم حذف ' + vehicles.length + ' مركبة!')) {
                     vehicles = [];
+                    filteredVehicles = [];
                     saveToStorage();
                     updateStats();
-                    renderVehicles();
+                    populateFilterOptions();
+                    resetFilters();
                     showNotification('تم حذف جميع المركبات', 'warning');
                 }
             }
