@@ -731,6 +731,9 @@
             <button class="btn btn-success" onclick="exportAllToExcel()">
                 <i class="fas fa-file-excel"></i> تصدير الكل إلى Excel
             </button>
+            <button class="btn btn-secondary" onclick="exportAllPhotosHTML()">
+                <i class="fas fa-images"></i> تصدير جميع الصور
+            </button>
             <button class="btn btn-warning" onclick="clearAll()">
                 <i class="fas fa-trash-restore"></i> مسح الكل
             </button>
@@ -1029,6 +1032,11 @@
                         <button class="btn-pdf" onclick="exportVehicleToPDF(${index})">
                             <i class="fas fa-file-pdf"></i> PDF
                         </button>
+                        ${vehicle.photos && vehicle.photos.length > 0 ? `
+                            <button class="btn-secondary" onclick="exportVehiclePhotos(${index})" style="background: #8b5cf6; color: white;">
+                                <i class="fas fa-images"></i> صور
+                            </button>
+                        ` : ''}
                         <button class="btn-edit" onclick="editVehicle(${index})">
                             <i class="fas fa-edit"></i> تعديل
                         </button>
@@ -1370,7 +1378,7 @@
             }
         }
 
-        function exportAllToExcel() {
+        async function exportAllToExcel() {
             if (vehicles.length === 0) {
                 showNotification('لا توجد مركبات للتصدير', 'warning');
                 return;
@@ -1395,17 +1403,19 @@
                     ['Fair Rated:', vehicles.filter(v => v.overallRating === 'fair').length],
                     ['Poor Rated:', vehicles.filter(v => v.overallRating === 'poor').length],
                     [''],
-                    ['Total Photos:', vehicles.reduce((sum, v) => sum + (v.photos ? v.photos.length : 0), 0)]
+                    ['Total Photos:', vehicles.reduce((sum, v) => sum + (v.photos ? v.photos.length : 0), 0)],
+                    [''],
+                    ['NOTE: Vehicle photos are saved separately in HTML files for each vehicle']
                 ];
                 
                 const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-                wsSummary['!cols'] = [{ wch: 30 }, { wch: 30 }];
+                wsSummary['!cols'] = [{ wch: 30 }, { wch: 40 }];
                 XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
                 
                 // All Vehicles Sheet
                 const allVehiclesData = [
                     ['Contract No', 'VIN', 'Customer', 'Make', 'Model', 'Year', 'Plate', 'Odometer', 'Color', 
-                     'Fuel Type', 'Repo Date', 'Rating', 'Value (SAR)', 'Photos']
+                     'Fuel Type', 'Repo Date', 'Rating', 'Value (SAR)', 'Photos Count']
                 ];
                 
                 vehicles.forEach(v => {
@@ -1431,7 +1441,7 @@
                 wsAll['!cols'] = Array(14).fill({ wch: 15 });
                 XLSX.utils.book_append_sheet(wb, wsAll, 'All Vehicles');
                 
-                // Individual sheets with photos as base64
+                // Individual sheets WITHOUT large base64 strings
                 vehicles.forEach((vehicle, index) => {
                     const detailData = [
                         [`VEHICLE #${index + 1} - DETAILED REPORT`],
@@ -1460,17 +1470,11 @@
                         [''],
                         ['=== PHOTOS ==='],
                         [`Number of Photos: ${vehicle.photos ? vehicle.photos.length : 0}`],
-                        vehicle.photos && vehicle.photos.length > 0 ? ['Photos are embedded as Base64 in cells below:'] : ['No photos available']
+                        ['Note:', `To view photos, export this vehicle's PDF or use the 'Export Photos' button`]
                     ];
                     
-                    if (vehicle.photos && vehicle.photos.length > 0) {
-                        vehicle.photos.forEach((photo, i) => {
-                            detailData.push([`Photo ${i + 1}:`, photo.substring(0, 50) + '...']);
-                        });
-                    }
-                    
                     const wsDetail = XLSX.utils.aoa_to_sheet(detailData);
-                    wsDetail['!cols'] = [{ wch: 25 }, { wch: 40 }];
+                    wsDetail['!cols'] = [{ wch: 25 }, { wch: 60 }];
                     
                     const sheetName = `Vehicle ${index + 1}`.substring(0, 31);
                     XLSX.utils.book_append_sheet(wb, wsDetail, sheetName);
@@ -1480,12 +1484,396 @@
                 XLSX.writeFile(wb, fileName);
                 
                 hideLoading();
-                showNotification(`تم تصدير ${vehicles.length} مركبة بنجاح!`, 'success');
+                showNotification(`تم تصدير ${vehicles.length} مركبة بنجاح! لعرض الصور، استخدم زر PDF أو 'تصدير الصور'`, 'success');
                 
             } catch (error) {
                 console.error('Export Error:', error);
                 hideLoading();
                 showNotification('حدث خطأ أثناء التصدير', 'error');
+            }
+        }
+
+        async function exportVehiclePhotos(index) {
+            const vehicle = vehicles[index];
+            
+            if (!vehicle.photos || vehicle.photos.length === 0) {
+                showNotification('لا توجد صور لهذه المركبة', 'warning');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                // Create HTML file with photos
+                const htmlContent = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صور المركبة - ${vehicle.contractNo || 'N/A'}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .info {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .label { font-weight: 600; color: #6b7280; }
+        .value { color: #111827; }
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .photo-box {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .photo-box h3 {
+            margin-bottom: 10px;
+            color: #374151;
+        }
+        .photo-box img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .photo-box img:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        @media print {
+            body { background: white; }
+            .photo-box { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 صور المركبة - Vehicle Photos</h1>
+        
+        <div class="info">
+            <div class="info-row">
+                <span class="label">رقم العقد | Contract No:</span>
+                <span class="value">${vehicle.contractNo || 'N/A'}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">العميل | Customer:</span>
+                <span class="value">${vehicle.customerName || 'N/A'}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">المركبة | Vehicle:</span>
+                <span class="value">${vehicle.make || 'N/A'} ${vehicle.model || ''} ${vehicle.year || ''}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">VIN:</span>
+                <span class="value">${vehicle.vin || 'N/A'}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">عدد الصور | Photos:</span>
+                <span class="value">${vehicle.photos.length}</span>
+            </div>
+        </div>
+
+        <div class="photos-grid">
+            ${vehicle.photos.map((photo, i) => `
+                <div class="photo-box">
+                    <h3>صورة ${i + 1} | Photo ${i + 1}</h3>
+                    <img src="${photo}" alt="صورة ${i + 1}" onclick="window.open(this.src, '_blank')">
+                </div>
+            `).join('')}
+        </div>
+
+        <div class="footer">
+            <p>تم الإنشاء في: ${new Date().toLocaleString('ar-SA')} | Generated: ${new Date().toLocaleString()}</p>
+            <p>نظام تقييم المركبات المستردة | Repossessed Vehicle Evaluation System</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+                // Download HTML file
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `Photos_${vehicle.contractNo || 'Vehicle'}_${new Date().toISOString().split('T')[0]}.html`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                hideLoading();
+                showNotification('تم تصدير الصور بنجاح! افتح ملف HTML لعرضها', 'success');
+
+            } catch (error) {
+                console.error('Export Photos Error:', error);
+                hideLoading();
+                showNotification('حدث خطأ أثناء تصدير الصور', 'error');
+            }
+        }
+
+        async function exportAllPhotosHTML() {
+            const vehiclesWithPhotos = vehicles.filter(v => v.photos && v.photos.length > 0);
+            
+            if (vehiclesWithPhotos.length === 0) {
+                showNotification('لا توجد صور للتصدير', 'warning');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const htmlContent = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جميع صور المركبات - All Vehicle Photos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .vehicle-section {
+            margin-bottom: 50px;
+            padding: 25px;
+            background: #f9fafb;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+        }
+        .vehicle-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .vehicle-header h2 {
+            margin-bottom: 5px;
+        }
+        .vehicle-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+        }
+        .label { font-weight: 600; color: #6b7280; }
+        .value { color: #111827; }
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .photo-box {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+            text-align: center;
+        }
+        .photo-box h4 {
+            margin-bottom: 8px;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+        .photo-box img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .photo-box img:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+        .summary {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .summary h3 {
+            margin-bottom: 15px;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            text-align: center;
+            color: #6b7280;
+        }
+        @media print {
+            body { background: white; }
+            .vehicle-section { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📸 جميع صور المركبات المستردة | All Repossessed Vehicle Photos</h1>
+        
+        <div class="summary">
+            <h3>ملخص | Summary</h3>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number">${vehiclesWithPhotos.length}</span>
+                    <span class="stat-label">مركبات | Vehicles</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">${vehiclesWithPhotos.reduce((sum, v) => sum + v.photos.length, 0)}</span>
+                    <span class="stat-label">صور | Photos</span>
+                </div>
+            </div>
+        </div>
+
+        ${vehiclesWithPhotos.map((vehicle, index) => `
+            <div class="vehicle-section">
+                <div class="vehicle-header">
+                    <h2>🚗 مركبة #${index + 1} | Vehicle #${index + 1}</h2>
+                    <p>${vehicle.contractNo || 'N/A'} - ${vehicle.make || ''} ${vehicle.model || ''} ${vehicle.year || ''}</p>
+                </div>
+                
+                <div class="vehicle-info">
+                    <div class="info-item">
+                        <span class="label">العميل | Customer:</span>
+                        <span class="value">${vehicle.customerName || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">VIN:</span>
+                        <span class="value">${vehicle.vin || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">اللوحة | Plate:</span>
+                        <span class="value">${vehicle.plateNo || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">عدد الصور | Photos:</span>
+                        <span class="value">${vehicle.photos.length}</span>
+                    </div>
+                </div>
+
+                <div class="photos-grid">
+                    ${vehicle.photos.map((photo, i) => `
+                        <div class="photo-box">
+                            <h4>صورة ${i + 1} | Photo ${i + 1}</h4>
+                            <img src="${photo}" alt="صورة ${i + 1}" onclick="window.open(this.src, '_blank')">
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('')}
+
+        <div class="footer">
+            <p>تم الإنشاء في: ${new Date().toLocaleString('ar-SA')} | Generated: ${new Date().toLocaleString()}</p>
+            <p><strong>نظام تقييم المركبات المستردة | Repossessed Vehicle Evaluation System</strong></p>
+            <p style="margin-top: 10px; font-size: 0.85rem;">
+                💡 نصيحة: يمكنك طباعة هذه الصفحة أو حفظها كـ PDF من متصفحك (Ctrl+P أو Cmd+P)
+            </p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `All_Vehicle_Photos_${new Date().toISOString().split('T')[0]}.html`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                hideLoading();
+                showNotification(`تم تصدير صور ${vehiclesWithPhotos.length} مركبة بنجاح!`, 'success');
+
+            } catch (error) {
+                console.error('Export All Photos Error:', error);
+                hideLoading();
+                showNotification('حدث خطأ أثناء تصدير الصور', 'error');
             }
         }
 
