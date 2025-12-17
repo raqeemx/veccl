@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام تقييم المركبات المستردة - متعدد</title>
+    <title>نظام تقييم المركبات المستردة - محسّن</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -26,7 +27,6 @@
             margin: 0 auto;
         }
 
-        /* Header */
         .main-header {
             background: white;
             padding: 25px;
@@ -74,7 +74,6 @@
             opacity: 0.9;
         }
 
-        /* Action Buttons */
         .action-buttons {
             background: white;
             padding: 20px;
@@ -132,7 +131,6 @@
             color: white;
         }
 
-        /* Vehicles List */
         .vehicles-section {
             background: white;
             padding: 25px;
@@ -162,7 +160,6 @@
             padding: 20px;
             background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
             transition: all 0.3s ease;
-            position: relative;
         }
 
         .vehicle-card:hover {
@@ -206,6 +203,28 @@
         .vehicle-card .info-row .value {
             color: #111827;
             font-weight: 600;
+        }
+
+        .vehicle-photos {
+            display: flex;
+            gap: 8px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .vehicle-photos img {
+            width: 100px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .vehicle-photos img:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
         }
 
         .rating-badge {
@@ -272,12 +291,16 @@
             color: white;
         }
 
+        .btn-pdf {
+            background: #e74c3c;
+            color: white;
+        }
+
         .card-actions button:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -300,7 +323,6 @@
             margin-bottom: 25px;
         }
 
-        /* Form Section */
         .form-section {
             background: white;
             padding: 30px;
@@ -366,6 +388,99 @@
             min-height: 100px;
         }
 
+        .photos-upload-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+            border: 2px dashed #e5e7eb;
+        }
+
+        .photos-upload-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .photos-upload-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .photo-upload-box {
+            position: relative;
+            aspect-ratio: 4/3;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            overflow: hidden;
+        }
+
+        .photo-upload-box:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .photo-upload-box input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .photo-upload-box i {
+            font-size: 2rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .photo-upload-box span {
+            font-size: 0.85rem;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .photo-preview {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-preview .remove-photo {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .photo-preview .remove-photo:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
         .form-actions-bottom {
             display: flex;
             gap: 15px;
@@ -375,7 +490,6 @@
             border-top: 2px solid #e5e7eb;
         }
 
-        /* Notification */
         .notification {
             position: fixed;
             top: 20px;
@@ -420,7 +534,6 @@
             }
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -444,7 +557,6 @@
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            position: relative;
         }
 
         .modal-header {
@@ -495,27 +607,26 @@
             color: #111827;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .vehicles-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header-stats {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .main-header h1 {
-                font-size: 1.3rem;
-            }
+        .modal-photos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
         }
 
-        /* Loading */
+        .modal-photos img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid #e5e7eb;
+        }
+
+        .modal-photos img:hover {
+            border-color: #667eea;
+        }
+
         .loading {
             position: fixed;
             inset: 0;
@@ -524,6 +635,8 @@
             align-items: center;
             justify-content: center;
             z-index: 3000;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .loading.active {
@@ -539,24 +652,50 @@
             animation: spin 1s linear infinite;
         }
 
+        .loading-text {
+            color: white;
+            font-size: 1.1rem;
+        }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vehicles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .photos-upload-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-stats {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .main-header h1 {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Loading -->
     <div class="loading" id="loading">
         <div class="loading-spinner"></div>
+        <div class="loading-text">جاري المعالجة...</div>
     </div>
 
-    <!-- Notification -->
     <div class="notification" id="notification">
         <i class="fas fa-check-circle"></i>
         <span id="notificationText"></span>
     </div>
 
-    <!-- Modal -->
     <div class="modal" id="viewModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -568,7 +707,6 @@
     </div>
 
     <div class="container">
-        <!-- Header -->
         <div class="main-header">
             <h1>
                 <i class="fas fa-car-side"></i>
@@ -586,7 +724,6 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="action-buttons">
             <button class="btn btn-primary" onclick="showForm()">
                 <i class="fas fa-plus"></i> إضافة مركبة جديدة
@@ -599,7 +736,6 @@
             </button>
         </div>
 
-        <!-- Form Section -->
         <div class="form-section" id="formSection">
             <h2>
                 <i class="fas fa-edit"></i>
@@ -665,6 +801,27 @@
                     </div>
                 </div>
 
+                <div class="photos-upload-section">
+                    <h3><i class="fas fa-camera"></i> صور المركبة (حتى 3 صور)</h3>
+                    <div class="photos-upload-grid">
+                        <div class="photo-upload-box" id="photoBox1">
+                            <input type="file" id="photo1" accept="image/*" onchange="handlePhotoUpload(0, event)">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 1<br><small>اضغط للرفع</small></span>
+                        </div>
+                        <div class="photo-upload-box" id="photoBox2">
+                            <input type="file" id="photo2" accept="image/*" onchange="handlePhotoUpload(1, event)">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 2<br><small>اضغط للرفع</small></span>
+                        </div>
+                        <div class="photo-upload-box" id="photoBox3">
+                            <input type="file" id="photo3" accept="image/*" onchange="handlePhotoUpload(2, event)">
+                            <i class="fas fa-image"></i>
+                            <span>الصورة 3<br><small>اضغط للرفع</small></span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>التقييم الإجمالي | Overall Rating</label>
                     <select id="overallRating">
@@ -708,7 +865,6 @@
             </form>
         </div>
 
-        <!-- Vehicles List -->
         <div class="vehicles-section">
             <h2>
                 <i class="fas fa-list"></i>
@@ -728,27 +884,22 @@
     </div>
 
     <script>
-        // Global Variables
         let vehicles = [];
-        let editingIndex = -1;
+        let vehiclePhotos = [null, null, null];
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadVehicles();
             updateStats();
             renderVehicles();
             
-            // Form submit
             document.getElementById('vehicleForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 saveVehicle();
             });
 
-            // Set default date
             document.getElementById('repoDate').value = new Date().toISOString().split('T')[0];
         });
 
-        // Load vehicles from localStorage
         function loadVehicles() {
             const saved = localStorage.getItem('vehicles');
             if (saved) {
@@ -761,12 +912,10 @@
             }
         }
 
-        // Save vehicles to localStorage
         function saveToStorage() {
             localStorage.setItem('vehicles', JSON.stringify(vehicles));
         }
 
-        // Update statistics
         function updateStats() {
             document.getElementById('totalVehicles').textContent = vehicles.length;
             
@@ -777,7 +926,42 @@
             document.getElementById('totalValue').textContent = totalValue.toLocaleString('ar-SA');
         }
 
-        // Render vehicles grid
+        function handlePhotoUpload(index, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('حجم الصورة كبير جداً (أقصى حد 5MB)', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                vehiclePhotos[index] = e.target.result;
+                const photoBox = document.getElementById(`photoBox${index + 1}`);
+                photoBox.innerHTML = `
+                    <div class="photo-preview">
+                        <img src="${e.target.result}" alt="صورة ${index + 1}">
+                        <button type="button" class="remove-photo" onclick="removePhoto(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(index) {
+            vehiclePhotos[index] = null;
+            const photoBox = document.getElementById(`photoBox${index + 1}`);
+            photoBox.innerHTML = `
+                <input type="file" id="photo${index + 1}" accept="image/*" onchange="handlePhotoUpload(${index}, event)">
+                <i class="fas fa-image"></i>
+                <span>الصورة ${index + 1}<br><small>اضغط للرفع</small></span>
+            `;
+        }
+
         function renderVehicles() {
             const grid = document.getElementById('vehiclesGrid');
             
@@ -803,6 +987,14 @@
                             <div class="timestamp">${new Date(vehicle.timestamp).toLocaleString('ar-SA')}</div>
                         </div>
                     </div>
+                    
+                    ${vehicle.photos && vehicle.photos.filter(p => p).length > 0 ? `
+                        <div class="vehicle-photos">
+                            ${vehicle.photos.filter(p => p).map(photo => `
+                                <img src="${photo}" alt="صورة المركبة" onclick="openPhotoModal('${photo}')">
+                            `).join('')}
+                        </div>
+                    ` : ''}
                     
                     <div class="info-row">
                         <span class="label">العميل:</span>
@@ -834,6 +1026,9 @@
                         <button class="btn-view" onclick="viewVehicle(${index})">
                             <i class="fas fa-eye"></i> عرض
                         </button>
+                        <button class="btn-pdf" onclick="exportVehicleToPDF(${index})">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
                         <button class="btn-edit" onclick="editVehicle(${index})">
                             <i class="fas fa-edit"></i> تعديل
                         </button>
@@ -845,25 +1040,26 @@
             `).join('');
         }
 
-        // Show form
         function showForm() {
             document.getElementById('formSection').classList.add('active');
             document.getElementById('formTitle').textContent = 'إضافة مركبة جديدة';
             document.getElementById('saveButtonText').textContent = 'حفظ المركبة';
             document.getElementById('editIndex').value = '-1';
             document.getElementById('vehicleForm').reset();
+            vehiclePhotos = [null, null, null];
+            for (let i = 0; i < 3; i++) {
+                removePhoto(i);
+            }
             document.getElementById('repoDate').value = new Date().toISOString().split('T')[0];
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Hide form
         function hideForm() {
             document.getElementById('formSection').classList.remove('active');
             document.getElementById('vehicleForm').reset();
-            editingIndex = -1;
+            vehiclePhotos = [null, null, null];
         }
 
-        // Save vehicle
         function saveVehicle() {
             const vehicle = {
                 contractNo: document.getElementById('contractNo').value,
@@ -882,19 +1078,18 @@
                 marketValue: document.getElementById('marketValue').value,
                 recommendation: document.getElementById('recommendation').value,
                 notes: document.getElementById('notes').value,
+                photos: vehiclePhotos.filter(p => p),
                 timestamp: new Date().toISOString()
             };
 
             const editIndex = parseInt(document.getElementById('editIndex').value);
             
             if (editIndex >= 0) {
-                // Update existing
                 vehicles[editIndex] = vehicle;
-                showNotification('تم تحديث المركبة بنجاح! | Vehicle updated successfully!', 'success');
+                showNotification('تم تحديث المركبة بنجاح!', 'success');
             } else {
-                // Add new
                 vehicles.push(vehicle);
-                showNotification('تم حفظ المركبة بنجاح! | Vehicle saved successfully!', 'success');
+                showNotification('تم حفظ المركبة بنجاح!', 'success');
             }
             
             saveToStorage();
@@ -903,13 +1098,20 @@
             hideForm();
         }
 
-        // View vehicle details
         function viewVehicle(index) {
             const vehicle = vehicles[index];
             const modal = document.getElementById('viewModal');
             const modalBody = document.getElementById('modalBody');
             
             modalBody.innerHTML = `
+                ${vehicle.photos && vehicle.photos.length > 0 ? `
+                    <div class="modal-photos">
+                        ${vehicle.photos.map(photo => `
+                            <img src="${photo}" alt="صورة المركبة" onclick="window.open('${photo}', '_blank')">
+                        `).join('')}
+                    </div>
+                ` : ''}
+                
                 <div class="detail-row">
                     <span class="label">رقم العقد:</span>
                     <span class="value">${vehicle.contractNo || 'N/A'}</span>
@@ -976,21 +1178,15 @@
                         <span class="value">${vehicle.notes}</span>
                     </div>
                 ` : ''}
-                <div class="detail-row">
-                    <span class="label">تاريخ الحفظ:</span>
-                    <span class="value">${new Date(vehicle.timestamp).toLocaleString('ar-SA')}</span>
-                </div>
             `;
             
             modal.classList.add('active');
         }
 
-        // Close modal
         function closeModal() {
             document.getElementById('viewModal').classList.remove('active');
         }
 
-        // Edit vehicle
         function editVehicle(index) {
             const vehicle = vehicles[index];
             
@@ -998,7 +1194,6 @@
             document.getElementById('formTitle').textContent = 'تعديل بيانات المركبة';
             document.getElementById('saveButtonText').textContent = 'تحديث المركبة';
             
-            // Fill form
             document.getElementById('contractNo').value = vehicle.contractNo || '';
             document.getElementById('vin').value = vehicle.vin || '';
             document.getElementById('customerName').value = vehicle.customerName || '';
@@ -1016,37 +1211,168 @@
             document.getElementById('recommendation').value = vehicle.recommendation || '';
             document.getElementById('notes').value = vehicle.notes || '';
             
+            vehiclePhotos = vehicle.photos || [null, null, null];
+            vehiclePhotos.forEach((photo, i) => {
+                if (photo) {
+                    const photoBox = document.getElementById(`photoBox${i + 1}`);
+                    photoBox.innerHTML = `
+                        <div class="photo-preview">
+                            <img src="${photo}" alt="صورة ${i + 1}">
+                            <button type="button" class="remove-photo" onclick="removePhoto(${i})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+            });
+            
             showForm();
         }
 
-        // Delete vehicle
         function deleteVehicle(index) {
-            if (confirm('هل أنت متأكد من حذف هذه المركبة؟\nAre you sure you want to delete this vehicle?')) {
+            if (confirm('هل أنت متأكد من حذف هذه المركبة؟')) {
                 vehicles.splice(index, 1);
                 saveToStorage();
                 updateStats();
                 renderVehicles();
-                showNotification('تم حذف المركبة | Vehicle deleted', 'info');
+                showNotification('تم حذف المركبة', 'info');
             }
         }
 
-        // Clear all vehicles
         function clearAll() {
-            if (confirm('⚠️ هل أنت متأكد من حذف جميع المركبات؟ لا يمكن التراجع!\n⚠️ Are you sure you want to delete all vehicles? This cannot be undone!')) {
-                if (confirm('تأكيد نهائي: سيتم حذف ' + vehicles.length + ' مركبة!\nFinal confirmation: ' + vehicles.length + ' vehicles will be deleted!')) {
+            if (confirm('⚠️ هل أنت متأكد من حذف جميع المركبات؟ لا يمكن التراجع!')) {
+                if (confirm('تأكيد نهائي: سيتم حذف ' + vehicles.length + ' مركبة!')) {
                     vehicles = [];
                     saveToStorage();
                     updateStats();
                     renderVehicles();
-                    showNotification('تم حذف جميع المركبات | All vehicles deleted', 'warning');
+                    showNotification('تم حذف جميع المركبات', 'warning');
                 }
             }
         }
 
-        // Export all to Excel
+        async function exportVehicleToPDF(index) {
+            const vehicle = vehicles[index];
+            showLoading();
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const margin = 15;
+                let y = margin;
+
+                // Header
+                pdf.setFillColor(102, 126, 234);
+                pdf.rect(0, 0, pageWidth, 25, 'F');
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFontSize(16);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('REPOSSESSED VEHICLE EVALUATION REPORT', pageWidth / 2, 12, { align: 'center' });
+                pdf.setFontSize(10);
+                pdf.text(`Contract: ${vehicle.contractNo || 'N/A'} | Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, 20, { align: 'center' });
+                
+                y = 35;
+                pdf.setTextColor(0, 0, 0);
+
+                // Helper function
+                const addRow = (label, value) => {
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text(label + ':', margin, y);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text(String(value || 'N/A'), margin + 60, y);
+                    y += 7;
+                };
+
+                const addSection = (title) => {
+                    y += 5;
+                    pdf.setFillColor(102, 126, 234);
+                    pdf.rect(margin, y - 5, pageWidth - 2 * margin, 8, 'F');
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(11);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text(title, margin + 3, y);
+                    pdf.setTextColor(0, 0, 0);
+                    y += 10;
+                };
+
+                // Basic Info
+                addSection('BASIC INFORMATION');
+                addRow('Contract Number', vehicle.contractNo);
+                addRow('VIN', vehicle.vin);
+                addRow('Customer Name', vehicle.customerName);
+                addRow('Make', vehicle.make);
+                addRow('Model', vehicle.model);
+                addRow('Year', vehicle.year);
+                addRow('Plate Number', vehicle.plateNo);
+                addRow('Odometer', vehicle.odometer ? `${vehicle.odometer} km` : 'N/A');
+                addRow('Color', vehicle.color);
+                addRow('Fuel Type', getFuelTypeText(vehicle.fuelType));
+                addRow('Repo Date', vehicle.repoDate);
+                addRow('Repo Location', vehicle.repoLocation);
+
+                // Evaluation
+                addSection('EVALUATION');
+                addRow('Overall Rating', getRatingText(vehicle.overallRating));
+                addRow('Market Value (SAR)', vehicle.marketValue);
+                addRow('Recommendation', getRecommendationText(vehicle.recommendation));
+                if (vehicle.notes) {
+                    addRow('Notes', vehicle.notes);
+                }
+
+                // Add photos
+                if (vehicle.photos && vehicle.photos.length > 0) {
+                    pdf.addPage();
+                    y = margin;
+                    addSection('VEHICLE PHOTOS');
+                    
+                    const photoWidth = (pageWidth - 3 * margin) / 2;
+                    const photoHeight = 60;
+                    let photoX = margin;
+                    let photoCount = 0;
+
+                    for (const photo of vehicle.photos) {
+                        if (photoCount > 0 && photoCount % 2 === 0) {
+                            y += photoHeight + 10;
+                            photoX = margin;
+                        }
+                        
+                        try {
+                            pdf.addImage(photo, 'JPEG', photoX, y, photoWidth, photoHeight);
+                            photoX += photoWidth + margin;
+                            photoCount++;
+                        } catch (e) {
+                            console.error('Error adding image:', e);
+                        }
+                    }
+                }
+
+                // Footer
+                const totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(128, 128, 128);
+                    pdf.text(`Page ${i} of ${totalPages}`, pageWidth / 2, 290, { align: 'center' });
+                    pdf.text(`Generated: ${new Date().toLocaleString()}`, pageWidth - margin, 290, { align: 'right' });
+                }
+
+                const fileName = `Vehicle_${vehicle.contractNo || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`;
+                pdf.save(fileName);
+                
+                hideLoading();
+                showNotification('تم تصدير PDF بنجاح!', 'success');
+            } catch (error) {
+                console.error('PDF Export Error:', error);
+                hideLoading();
+                showNotification('حدث خطأ أثناء إنشاء PDF', 'error');
+            }
+        }
+
         function exportAllToExcel() {
             if (vehicles.length === 0) {
-                showNotification('لا توجد مركبات للتصدير | No vehicles to export', 'warning');
+                showNotification('لا توجد مركبات للتصدير', 'warning');
                 return;
             }
             
@@ -1062,13 +1388,14 @@
                     [''],
                     ['Total Vehicles:', vehicles.length],
                     ['Total Value (SAR):', vehicles.reduce((sum, v) => sum + (parseFloat(v.marketValue) || 0), 0).toLocaleString('ar-SA')],
-                    ['Average Value (SAR):', (vehicles.reduce((sum, v) => sum + (parseFloat(v.marketValue) || 0), 0) / vehicles.length).toFixed(2)],
                     [''],
                     ['=== STATISTICS ==='],
                     ['Excellent Rated:', vehicles.filter(v => v.overallRating === 'excellent').length],
                     ['Good Rated:', vehicles.filter(v => v.overallRating === 'good').length],
                     ['Fair Rated:', vehicles.filter(v => v.overallRating === 'fair').length],
-                    ['Poor Rated:', vehicles.filter(v => v.overallRating === 'poor').length]
+                    ['Poor Rated:', vehicles.filter(v => v.overallRating === 'poor').length],
+                    [''],
+                    ['Total Photos:', vehicles.reduce((sum, v) => sum + (v.photos ? v.photos.length : 0), 0)]
                 ];
                 
                 const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
@@ -1078,7 +1405,7 @@
                 // All Vehicles Sheet
                 const allVehiclesData = [
                     ['Contract No', 'VIN', 'Customer', 'Make', 'Model', 'Year', 'Plate', 'Odometer', 'Color', 
-                     'Fuel Type', 'Repo Date', 'Rating', 'Value (SAR)', 'Recommendation']
+                     'Fuel Type', 'Repo Date', 'Rating', 'Value (SAR)', 'Photos']
                 ];
                 
                 vehicles.forEach(v => {
@@ -1096,7 +1423,7 @@
                         v.repoDate || '',
                         getRatingText(v.overallRating),
                         v.marketValue || '',
-                        getRecommendationText(v.recommendation)
+                        v.photos ? v.photos.length : 0
                     ]);
                 });
                 
@@ -1104,7 +1431,7 @@
                 wsAll['!cols'] = Array(14).fill({ wch: 15 });
                 XLSX.utils.book_append_sheet(wb, wsAll, 'All Vehicles');
                 
-                // Individual sheets for each vehicle
+                // Individual sheets with photos as base64
                 vehicles.forEach((vehicle, index) => {
                     const detailData = [
                         [`VEHICLE #${index + 1} - DETAILED REPORT`],
@@ -1131,8 +1458,16 @@
                         ['=== NOTES ==='],
                         [vehicle.notes || 'No notes'],
                         [''],
-                        ['Saved At:', new Date(vehicle.timestamp).toLocaleString()]
+                        ['=== PHOTOS ==='],
+                        [`Number of Photos: ${vehicle.photos ? vehicle.photos.length : 0}`],
+                        vehicle.photos && vehicle.photos.length > 0 ? ['Photos are embedded as Base64 in cells below:'] : ['No photos available']
                     ];
+                    
+                    if (vehicle.photos && vehicle.photos.length > 0) {
+                        vehicle.photos.forEach((photo, i) => {
+                            detailData.push([`Photo ${i + 1}:`, photo.substring(0, 50) + '...']);
+                        });
+                    }
                     
                     const wsDetail = XLSX.utils.aoa_to_sheet(detailData);
                     wsDetail['!cols'] = [{ wch: 25 }, { wch: 40 }];
@@ -1141,21 +1476,19 @@
                     XLSX.utils.book_append_sheet(wb, wsDetail, sheetName);
                 });
                 
-                // Save file
                 const fileName = `All_Vehicles_${new Date().toISOString().split('T')[0]}.xlsx`;
                 XLSX.writeFile(wb, fileName);
                 
                 hideLoading();
-                showNotification(`تم تصدير ${vehicles.length} مركبة بنجاح! | ${vehicles.length} vehicles exported successfully!`, 'success');
+                showNotification(`تم تصدير ${vehicles.length} مركبة بنجاح!`, 'success');
                 
             } catch (error) {
                 console.error('Export Error:', error);
                 hideLoading();
-                showNotification('حدث خطأ أثناء التصدير | Export error', 'error');
+                showNotification('حدث خطأ أثناء التصدير', 'error');
             }
         }
 
-        // Helper functions
         function getRatingText(value) {
             const ratings = {
                 'excellent': 'ممتاز | Excellent',
@@ -1206,7 +1539,10 @@
             document.getElementById('loading').classList.remove('active');
         }
 
-        // Close modal on outside click
+        function openPhotoModal(photoUrl) {
+            window.open(photoUrl, '_blank');
+        }
+
         document.getElementById('viewModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
