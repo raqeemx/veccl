@@ -1,181 +1,72 @@
 /**
- * Enhanced Vehicle Evaluation Form
- * Main JavaScript File
- * Version: 2.0
+ * نموذج تقييم مركبة مستردّة - النسخة المتقدمة
+ * Repossessed Vehicle Evaluation Form - Advanced Version
+ * 
+ * Features:
+ * - Dark Mode with persistence
+ * - Multi-vehicle management
+ * - Auto-save with status indicator
+ * - Advanced validation
+ * - Export to PDF, Excel, JSON
+ * - Image upload with validation
  */
 
 // ===== Global Variables =====
+let currentVehicleId = null;
 let autoSaveTimer = null;
-let notificationQueue = [];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const AUTO_SAVE_INTERVAL = 2000; // 2 seconds
+const DATA_EXPIRY_HOURS = 24;
 
 // ===== Initialize on Page Load =====
 document.addEventListener('DOMContentLoaded', function() {
+    initializeDarkMode();
     initializeForm();
     setupEventListeners();
-    setDefaultDates();
-    generateFormNumber();
-    loadThemePreference();
-    checkSavedData();
-    initializeValidation();
+    loadVehicleList();
+    updateVehicleCount();
 });
 
-// ===== Initialization Functions =====
-
-/**
- * Initialize form with default settings
- */
-function initializeForm() {
-    console.log('🚀 Initializing Enhanced Vehicle Evaluation Form...');
-    
-    // Check browser compatibility
-    if (!window.localStorage) {
-        showNotification('المتصفح لا يدعم الحفظ التلقائي | Browser does not support auto-save', 'warning');
+// ===== Dark Mode =====
+function initializeDarkMode() {
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    if (isDark) {
+        document.documentElement.classList.add('dark');
     }
-    
-    // Initialize form state
-    window.formState = {
-        isDirty: false,
-        lastSaved: null,
-        photos: {
-            photo1: null,
-            photo2: null,
-            photo3: null
-        }
-    };
 }
 
-/**
- * Setup all event listeners
- */
-function setupEventListeners() {
-    const form = document.getElementById('vehicleEvaluationForm');
-    
-    // Form change events for auto-save
-    if (form) {
-        form.addEventListener('change', handleFormChange);
-        form.addEventListener('input', debounce(handleFormChange, 2000));
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveForm();
-        });
-    }
-    
-    // VIN validation
-    const vinInput = document.getElementById('vin');
-    if (vinInput) {
-        vinInput.addEventListener('input', function(e) {
-            this.value = this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '');
-            validateField(this);
-        });
-    }
-    
-    // Dark mode toggle
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', toggleDarkMode);
-    }
-    
-    // Keys checkbox handler
-    const keysCheckbox = document.querySelector('input[name="accessories"][value="keys"]');
-    if (keysCheckbox) {
-        keysCheckbox.addEventListener('change', toggleKeysCount);
-    }
-    
-    // Real-time validation for required fields
-    const requiredFields = document.querySelectorAll('input[data-required="true"]');
-    requiredFields.forEach(field => {
-        field.addEventListener('blur', function() {
-            validateField(this);
-        });
-        field.addEventListener('input', function() {
-            if (this.value.trim()) {
-                clearFieldError(this);
-            }
-        });
-    });
-    
-    // Photo size validation
-    ['photo1', 'photo2', 'photo3'].forEach((photoId, index) => {
-        const input = document.getElementById(photoId);
-        if (input) {
-            input.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file && file.size > 5 * 1024 * 1024) {
-                    showNotification('حجم الصورة كبير جداً (أقصى حد 5MB) | File too large (max 5MB)', 'error');
-                    this.value = '';
-                    return;
-                }
-                previewImage(this, 'preview' + (index + 1));
-            });
-        }
-    });
-    
-    // Prevent accidental page close
-    window.addEventListener('beforeunload', function(e) {
-        if (window.formState.isDirty) {
-            e.preventDefault();
-            e.returnValue = 'لديك تغييرات غير محفوظة. هل تريد المغادرة؟ | You have unsaved changes. Leave anyway?';
-            return e.returnValue;
-        }
-    });
-}
-
-/**
- * Initialize field validation
- */
-function initializeValidation() {
-    const requiredFields = document.querySelectorAll('input[data-required="true"]');
-    requiredFields.forEach(field => {
-        const errorSpan = field.parentElement.querySelector('.error-message');
-        if (!errorSpan) {
-            const span = document.createElement('span');
-            span.className = 'error-message';
-            field.parentElement.appendChild(span);
-        }
-    });
-}
-
-// ===== Dark Mode Functions =====
-
-/**
- * Toggle dark mode
- */
 function toggleDarkMode() {
-    const body = document.body;
-    const isDark = body.classList.toggle('dark-mode');
-    
-    // Update icon
-    const icon = document.querySelector('#darkModeToggle i');
-    if (icon) {
-        icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-    }
-    
-    // Save preference
-    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-    
-    showNotification(
-        isDark ? 'تم تفعيل الوضع الليلي | Dark mode enabled' : 'تم تفعيل الوضع النهاري | Light mode enabled',
-        'info'
-    );
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('darkMode', isDark);
+    showNotification(isDark ? 'تم تفعيل الوضع الليلي 🌙' : 'تم تفعيل الوضع النهاري ☀️', 'info');
 }
 
-/**
- * Load theme preference
- */
-function loadThemePreference() {
-    const darkMode = localStorage.getItem('darkMode');
-    if (darkMode === 'enabled') {
-        document.body.classList.add('dark-mode');
-        const icon = document.querySelector('#darkModeToggle i');
-        if (icon) icon.className = 'fas fa-sun';
+// ===== Form Initialization =====
+function initializeForm() {
+    generateFormNumber();
+    setDefaultDate();
+    
+    // Check for auto-saved data
+    const autoSavedData = localStorage.getItem('autoSaveData');
+    if (autoSavedData) {
+        const data = JSON.parse(autoSavedData);
+        const savedTime = new Date(data.savedAt);
+        const now = new Date();
+        const hoursDiff = (now - savedTime) / (1000 * 60 * 60);
+        
+        if (hoursDiff < DATA_EXPIRY_HOURS) {
+            if (confirm('يوجد بيانات غير محفوظة. هل تريد استعادتها؟\nThere is unsaved data. Would you like to restore it?')) {
+                loadFormData(data);
+                currentVehicleId = data.vehicleId || null;
+            } else {
+                localStorage.removeItem('autoSaveData');
+            }
+        } else {
+            localStorage.removeItem('autoSaveData');
+        }
     }
 }
 
-// ===== Form Functions =====
-
-/**
- * Generate unique form number
- */
 function generateFormNumber() {
     const formNumberInput = document.getElementById('formNumber');
     if (formNumberInput && !formNumberInput.value) {
@@ -185,109 +76,212 @@ function generateFormNumber() {
     }
 }
 
-/**
- * Set default dates
- */
-function setDefaultDates() {
+function setDefaultDate() {
     const today = new Date().toISOString().split('T')[0];
-    const repoDate = document.getElementById('repoDate');
-    const evaluationDate = document.getElementById('evaluationDate');
+    const evaluationDateInput = document.getElementById('evaluationDate');
+    const repoDateInput = document.getElementById('repoDate');
     
-    if (repoDate && !repoDate.value) repoDate.value = today;
-    if (evaluationDate && !evaluationDate.value) evaluationDate.value = today;
-}
-
-/**
- * Handle form changes for auto-save
- */
-function handleFormChange() {
-    window.formState.isDirty = true;
-    
-    // Debounced auto-save
-    clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(() => {
-        autoSaveForm();
-    }, 2000);
-}
-
-/**
- * Auto-save form data
- */
-function autoSaveForm() {
-    const formData = collectFormData();
-    
-    if (formData.contractNo || formData.customerName || formData.vin) {
-        localStorage.setItem('vehicleEvalForm', JSON.stringify(formData));
-        window.formState.lastSaved = new Date();
-        showAutoSaveStatus('محفوظ تلقائياً | Auto-saved');
-        console.log('✅ Auto-saved at:', new Date().toLocaleTimeString());
+    if (evaluationDateInput && !evaluationDateInput.value) {
+        evaluationDateInput.value = today;
+    }
+    if (repoDateInput && !repoDateInput.value) {
+        repoDateInput.value = today;
     }
 }
 
-/**
- * Show auto-save status
- */
-function showAutoSaveStatus(message) {
-    const statusElement = document.getElementById('autoSaveStatus');
-    if (statusElement) {
-        statusElement.textContent = message;
-        statusElement.style.display = 'block';
-        
-        setTimeout(() => {
-            statusElement.style.display = 'none';
-        }, 2000);
-    }
-}
-
-/**
- * Check for saved data on load
- */
-function checkSavedData() {
-    const savedData = localStorage.getItem('vehicleEvalForm');
+// ===== Event Listeners =====
+function setupEventListeners() {
+    const form = document.getElementById('vehicleEvaluationForm');
     
-    if (savedData) {
-        try {
-            const data = JSON.parse(savedData);
-            const savedTime = new Date(data.savedAt);
-            const now = new Date();
-            const hoursDiff = (now - savedTime) / (1000 * 60 * 60);
-            
-            // Only restore if saved within last 24 hours
-            if (hoursDiff < 24) {
-                if (confirm('يوجد نموذج محفوظ. هل تريد استعادته؟\nFound saved form. Restore it?')) {
-                    loadFormData(data);
-                    showNotification('تم استعادة البيانات بنجاح | Data restored successfully', 'success');
-                }
-            } else {
-                // Clear old data
-                localStorage.removeItem('vehicleEvalForm');
+    // Auto-save on input
+    form.addEventListener('input', () => {
+        clearTimeout(autoSaveTimer);
+        updateSaveStatus('saving');
+        autoSaveTimer = setTimeout(autoSave, AUTO_SAVE_INTERVAL);
+    });
+    
+    form.addEventListener('change', () => {
+        clearTimeout(autoSaveTimer);
+        updateSaveStatus('saving');
+        autoSaveTimer = setTimeout(autoSave, AUTO_SAVE_INTERVAL);
+    });
+    
+    // VIN validation
+    const vinInput = document.getElementById('vin');
+    if (vinInput) {
+        vinInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '');
+        });
+    }
+    
+    // Real-time validation for required fields
+    const requiredInputs = form.querySelectorAll('[required]');
+    requiredInputs.forEach(input => {
+        input.addEventListener('blur', () => validateField(input));
+        input.addEventListener('input', () => {
+            if (input.classList.contains('error')) {
+                validateField(input);
             }
-        } catch (e) {
-            console.error('Error loading saved data:', e);
-            showNotification('فشل تحميل البيانات المحفوظة | Failed to load saved data', 'error');
+        });
+    });
+    
+    // Setup drag and drop for photos
+    for (let i = 1; i <= 3; i++) {
+        const dropzone = document.getElementById(`dropzone${i}`);
+        if (dropzone) {
+            dropzone.addEventListener('dragover', handleDragOver);
+            dropzone.addEventListener('dragleave', handleDragLeave);
+            dropzone.addEventListener('drop', (e) => handleDrop(e, i));
         }
     }
 }
 
-// ===== Data Management Functions =====
+// ===== Auto Save =====
+function autoSave() {
+    const formData = collectFormData();
+    formData.vehicleId = currentVehicleId;
+    formData.savedAt = new Date().toISOString();
+    localStorage.setItem('autoSaveData', JSON.stringify(formData));
+    updateSaveStatus('saved');
+}
 
-/**
- * Collect all form data
- */
+function updateSaveStatus(status) {
+    const saveStatus = document.getElementById('saveStatus');
+    if (!saveStatus) return;
+    
+    if (status === 'saving') {
+        saveStatus.innerHTML = `
+            <i class="fas fa-circle-notch fa-spin text-yellow-500 text-[8px]"></i>
+            <span>جاري الحفظ...</span>
+        `;
+    } else if (status === 'saved') {
+        saveStatus.innerHTML = `
+            <i class="fas fa-circle text-green-500 text-[8px]"></i>
+            <span>محفوظ</span>
+        `;
+    }
+}
+
+// ===== Validation =====
+function validateField(input) {
+    const formGroup = input.closest('.form-group');
+    const errorMessage = formGroup?.querySelector('.error-message');
+    
+    if (!input.value.trim()) {
+        input.classList.add('error');
+        formGroup?.classList.add('has-error');
+        if (errorMessage) {
+            errorMessage.textContent = 'هذا الحقل مطلوب';
+        }
+        return false;
+    } else {
+        input.classList.remove('error');
+        formGroup?.classList.remove('has-error');
+        return true;
+    }
+}
+
+function validateForm(showErrors = true) {
+    const requiredFields = document.querySelectorAll('#vehicleEvaluationForm [required]');
+    let isValid = true;
+    let firstError = null;
+    
+    requiredFields.forEach(field => {
+        if (!validateField(field)) {
+            isValid = false;
+            if (!firstError) firstError = field;
+        }
+    });
+    
+    if (!isValid && showErrors) {
+        firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showNotification('يرجى ملء جميع الحقول المطلوبة', 'error');
+    }
+    
+    return isValid;
+}
+
+// ===== Photo Handling =====
+function handlePhotoUpload(input, index) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+        showNotification('حجم الصورة يجب أن يكون أقل من 5MB', 'error');
+        input.value = '';
+        return;
+    }
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+        showNotification('يرجى اختيار ملف صورة صحيح', 'error');
+        input.value = '';
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const preview = document.getElementById(`preview${index}`);
+        const dropzone = document.getElementById(`dropzone${index}`);
+        const removeBtn = document.getElementById(`removeBtn${index}`);
+        
+        preview.innerHTML = `<img src="${e.target.result}" alt="صورة ${index}" class="w-full h-full object-cover">`;
+        dropzone.classList.add('has-image');
+        removeBtn.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+}
+
+function removePhoto(index) {
+    const input = document.getElementById(`photo${index}`);
+    const preview = document.getElementById(`preview${index}`);
+    const dropzone = document.getElementById(`dropzone${index}`);
+    const removeBtn = document.getElementById(`removeBtn${index}`);
+    
+    input.value = '';
+    preview.innerHTML = `
+        <i class="fas fa-camera text-4xl text-gray-400 dark:text-gray-500 mb-2"></i>
+        <span class="text-sm text-gray-500">اضغط أو اسحب صورة</span>
+        <span class="text-xs text-gray-400 mt-1">الحد الأقصى: 5MB</span>
+    `;
+    dropzone.classList.remove('has-image');
+    removeBtn.classList.add('hidden');
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('border-primary-500', 'bg-primary-50');
+}
+
+function handleDragLeave(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('border-primary-500', 'bg-primary-50');
+}
+
+function handleDrop(e, index) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('border-primary-500', 'bg-primary-50');
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+        const input = document.getElementById(`photo${index}`);
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        input.files = dataTransfer.files;
+        handlePhotoUpload(input, index);
+    }
+}
+
+// ===== Data Collection =====
 function collectFormData() {
     const form = document.getElementById('vehicleEvaluationForm');
     const formData = new FormData(form);
-    const data = {
-        formNumber: document.getElementById('formNumber').value,
-        savedAt: new Date().toISOString()
-    };
+    const data = {};
     
-    // Get all input values
     formData.forEach((value, key) => {
-        if (value instanceof File) return; // Skip file inputs
-        
+        if (value instanceof File) return;
         if (data[key]) {
-            // Handle multiple values (checkboxes)
             if (Array.isArray(data[key])) {
                 data[key].push(value);
             } else {
@@ -298,33 +292,18 @@ function collectFormData() {
         }
     });
     
-    // Save photo previews
-    data.photos = {};
-    ['photo1', 'photo2', 'photo3'].forEach(photoId => {
-        const preview = document.getElementById('preview' + photoId.charAt(photoId.length - 1));
-        const img = preview?.querySelector('img');
-        if (img) {
-            data.photos[photoId] = img.src;
-        }
-    });
-    
+    data.formNumber = document.getElementById('formNumber').value;
     return data;
 }
 
-/**
- * Load form data from saved object
- */
 function loadFormData(data) {
     const form = document.getElementById('vehicleEvaluationForm');
     
-    // Load form number
-    if (data.formNumber) {
-        document.getElementById('formNumber').value = data.formNumber;
-    }
-    
-    // Load all fields
     Object.keys(data).forEach(key => {
-        if (key === 'savedAt' || key === 'photos' || key === 'formNumber') return;
+        if (key === 'formNumber') {
+            document.getElementById('formNumber').value = data[key];
+            return;
+        }
         
         const element = form.elements[key];
         if (!element) return;
@@ -335,276 +314,243 @@ function loadFormData(data) {
             checkboxes.forEach(cb => {
                 cb.checked = values.includes(cb.value);
             });
-        } else if (element.type === 'radio') {
+        } else if (element.type === 'radio' || (element.length && element[0]?.type === 'radio')) {
             const radios = form.querySelectorAll(`input[name="${key}"]`);
             radios.forEach(radio => {
-                radio.checked = radio.value === data[key];
-            });
-        } else if (element.length && element[0].type === 'radio') {
-            Array.from(element).forEach(radio => {
                 radio.checked = radio.value === data[key];
             });
         } else if (element.type !== 'file') {
             element.value = data[key];
         }
     });
-    
-    // Load photos
-    if (data.photos) {
-        Object.keys(data.photos).forEach(photoId => {
-            const previewId = 'preview' + photoId.charAt(photoId.length - 1);
-            const preview = document.getElementById(previewId);
-            if (preview && data.photos[photoId]) {
-                preview.innerHTML = `<img src="${data.photos[photoId]}" alt="Vehicle Photo">`;
-                const removeBtn = document.getElementById('removeBtn' + photoId.charAt(photoId.length - 1));
-                if (removeBtn) removeBtn.style.display = 'inline-block';
-            }
-        });
-    }
-    
-    // Check if keys checkbox should show count
-    const keysCheckbox = document.querySelector('input[name="accessories"][value="keys"]');
-    if (keysCheckbox && keysCheckbox.checked) {
-        document.getElementById('keysCountContainer').style.display = 'block';
-    }
-    
-    window.formState.isDirty = false;
 }
 
-// ===== Validation Functions =====
-
-/**
- * Validate entire form
- */
-function validateForm(showErrors = true) {
-    const requiredFields = document.querySelectorAll('input[data-required="true"]');
-    let isValid = true;
-    const errors = [];
-    
-    requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-            isValid = false;
-            const label = field.parentElement.querySelector('label')?.textContent || field.name;
-            errors.push(label);
-            
-            if (showErrors) {
-                markFieldAsError(field);
-            }
-        } else {
-            clearFieldError(field);
-        }
-    });
-    
-    // VIN validation
-    const vinField = document.getElementById('vin');
-    if (vinField && vinField.value && vinField.value.length !== 17) {
-        isValid = false;
-        errors.push('VIN must be 17 characters');
-        if (showErrors) {
-            markFieldAsError(vinField, 'VIN يجب أن يكون 17 حرف | VIN must be 17 characters');
-        }
-    }
-    
-    if (!isValid && showErrors) {
-        showNotification(
-            `يرجى ملء الحقول المطلوبة (${errors.length}) | Please fill required fields (${errors.length})`,
-            'error'
-        );
-    }
-    
-    return isValid;
+// ===== Vehicle Management =====
+function getVehicles() {
+    const vehicles = localStorage.getItem('vehicles');
+    return vehicles ? JSON.parse(vehicles) : [];
 }
 
-/**
- * Validate single field
- */
-function validateField(field) {
-    if (field.hasAttribute('data-required') && !field.value.trim()) {
-        markFieldAsError(field);
-        return false;
-    } else if (field.id === 'vin' && field.value && field.value.length !== 17) {
-        markFieldAsError(field, 'VIN يجب أن يكون 17 حرف | VIN must be 17 characters');
-        return false;
+function saveVehicles(vehicles) {
+    localStorage.setItem('vehicles', JSON.stringify(vehicles));
+}
+
+function saveVehicle() {
+    if (!validateForm()) return;
+    
+    const vehicles = getVehicles();
+    const data = collectFormData();
+    data.savedAt = new Date().toISOString();
+    
+    if (currentVehicleId) {
+        // Update existing
+        const index = vehicles.findIndex(v => v.id === currentVehicleId);
+        if (index !== -1) {
+            data.id = currentVehicleId;
+            vehicles[index] = data;
+            showNotification('تم تحديث بيانات المركبة بنجاح ✅', 'success');
+        }
     } else {
-        clearFieldError(field);
-        return true;
+        // Create new
+        data.id = Date.now().toString();
+        currentVehicleId = data.id;
+        vehicles.push(data);
+        showNotification('تم حفظ المركبة بنجاح ✅', 'success');
     }
-}
-
-/**
- * Mark field as having error
- */
-function markFieldAsError(field, message = '') {
-    field.classList.add('error');
-    const errorSpan = field.parentElement.querySelector('.error-message');
-    if (errorSpan) {
-        errorSpan.textContent = message || 'هذا الحقل مطلوب | This field is required';
-    }
-}
-
-/**
- * Clear field error
- */
-function clearFieldError(field) {
-    field.classList.remove('error');
-    const errorSpan = field.parentElement.querySelector('.error-message');
-    if (errorSpan) {
-        errorSpan.textContent = '';
-    }
-}
-
-// ===== Photo Management Functions =====
-
-/**
- * Preview image when selected
- */
-function previewImage(input, previewId) {
-    const preview = document.getElementById(previewId);
-    const removeBtn = document.getElementById('removeBtn' + previewId.charAt(previewId.length - 1));
     
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        
-        // Validate file size (5MB max)
-        if (file.size > 5 * 1024 * 1024) {
-            showNotification('حجم الصورة كبير جداً (أقصى حد 5MB) | File too large (max 5MB)', 'error');
-            input.value = '';
-            return;
-        }
-        
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
-            showNotification('يرجى اختيار ملف صورة | Please select an image file', 'error');
-            input.value = '';
-            return;
-        }
-        
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            preview.innerHTML = `<img src="${e.target.result}" alt="Vehicle Photo">`;
-            if (removeBtn) {
-                removeBtn.style.display = 'inline-block';
-            }
-            window.formState.isDirty = true;
-        };
-        
-        reader.onerror = function() {
-            showNotification('فشل تحميل الصورة | Failed to load image', 'error');
-        };
-        
-        reader.readAsDataURL(file);
+    saveVehicles(vehicles);
+    localStorage.removeItem('autoSaveData');
+    loadVehicleList();
+    updateVehicleCount();
+}
+
+function loadVehicle(id) {
+    const vehicles = getVehicles();
+    const vehicle = vehicles.find(v => v.id === id);
+    
+    if (vehicle) {
+        resetForm(false);
+        loadFormData(vehicle);
+        currentVehicleId = id;
+        toggleVehicleList();
+        showNotification('تم تحميل بيانات المركبة', 'info');
     }
 }
 
-/**
- * Remove image from preview
- */
-function removeImage(inputId, previewId) {
-    const input = document.getElementById(inputId);
-    const preview = document.getElementById(previewId);
-    const removeBtn = document.getElementById('removeBtn' + previewId.charAt(previewId.length - 1));
+function deleteVehicle(id, event) {
+    event.stopPropagation();
     
-    if (input) input.value = '';
+    if (!confirm('هل أنت متأكد من حذف هذه المركبة؟')) return;
     
-    if (preview) {
-        preview.innerHTML = `
-            <i class="fas fa-camera"></i>
-            <span>اضغط لإضافة صورة<br><small>Max 5MB</small></span>
+    let vehicles = getVehicles();
+    vehicles = vehicles.filter(v => v.id !== id);
+    saveVehicles(vehicles);
+    
+    if (currentVehicleId === id) {
+        currentVehicleId = null;
+        resetForm(false);
+    }
+    
+    loadVehicleList();
+    updateVehicleCount();
+    showNotification('تم حذف المركبة', 'info');
+}
+
+function newVehicle() {
+    currentVehicleId = null;
+    resetForm(false);
+    generateFormNumber();
+    setDefaultDate();
+    toggleVehicleList();
+    showNotification('نموذج جديد جاهز', 'info');
+}
+
+function loadVehicleList() {
+    const container = document.getElementById('vehicleListContainer');
+    const vehicles = getVehicles();
+    
+    if (vehicles.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-car text-4xl mb-3 opacity-50"></i>
+                <p>لا توجد مركبات محفوظة</p>
+            </div>
         `;
-    }
-    
-    if (removeBtn) removeBtn.style.display = 'none';
-    
-    window.formState.isDirty = true;
-}
-
-// ===== Form Action Functions =====
-
-/**
- * Save form data
- */
-function saveForm() {
-    if (!validateForm(true)) {
         return;
     }
     
-    const formData = collectFormData();
-    localStorage.setItem('vehicleEvalForm', JSON.stringify(formData));
-    window.formState.isDirty = false;
-    window.formState.lastSaved = new Date();
-    
-    showNotification('تم حفظ النموذج بنجاح! | Form saved successfully!', 'success');
-    
-    // Offer to download JSON
-    setTimeout(() => {
-        if (confirm('هل تريد تحميل نسخة احتياطية (JSON)؟\nDownload backup copy (JSON)?')) {
-            downloadFormData(formData);
-        }
-    }, 500);
+    container.innerHTML = vehicles.map(v => `
+        <div class="vehicle-item ${v.id === currentVehicleId ? 'active' : ''}" onclick="loadVehicle('${v.id}')">
+            <div class="flex items-center justify-between">
+                <div class="flex-1">
+                    <div class="font-semibold text-gray-800 dark:text-gray-200">${v.make || ''} ${v.model || ''} ${v.year || ''}</div>
+                    <div class="text-xs text-gray-500">${v.customerName || 'بدون اسم'}</div>
+                    <div class="text-xs text-gray-400 mt-1">${v.formNumber || ''}</div>
+                </div>
+                <button onclick="deleteVehicle('${v.id}', event)" class="text-red-500 hover:text-red-700 p-2">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
 }
 
-/**
- * Print form
- */
-function printForm() {
-    if (!validateForm(false)) {
-        if (!confirm('بعض الحقول فارغة. هل تريد الطباعة على أي حال؟\nSome fields are empty. Print anyway?')) {
-            return;
-        }
-    }
-    
-    window.print();
+function updateVehicleCount() {
+    const count = getVehicles().length;
+    document.getElementById('vehicleCount').textContent = `${count} مركبة محفوظة`;
 }
 
-/**
- * Reset form
- */
-function handleReset() {
-    if (!confirm('هل أنت متأكد من مسح النموذج؟ سيتم حذف جميع البيانات.\nAre you sure? All data will be cleared.')) {
-        return false;
-    }
+function toggleVehicleList() {
+    const panel = document.getElementById('vehicleListPanel');
+    const overlay = document.getElementById('vehicleListOverlay');
     
-    // Clear localStorage
-    localStorage.removeItem('vehicleEvalForm');
-    
-    // Clear photos
-    ['photo1', 'photo2', 'photo3'].forEach((photoId, index) => {
-        removeImage(photoId, 'preview' + (index + 1));
-    });
-    
-    // Reset form
-    document.getElementById('vehicleEvaluationForm').reset();
-    
-    // Regenerate form number and dates
-    setTimeout(() => {
-        generateFormNumber();
-        setDefaultDates();
-        window.formState.isDirty = false;
-        showNotification('تم مسح النموذج | Form cleared', 'info');
-    }, 100);
-    
-    return false;
+    panel.classList.toggle('translate-x-full');
+    overlay.classList.toggle('hidden');
 }
 
 // ===== Export Functions =====
-
-/**
- * Export to PDF
- */
-async function exportToPDF() {
+function exportToExcel() {
     if (!validateForm(false)) {
-        if (!confirm('بعض الحقول فارغة. هل تريد التصدير على أي حال؟\nSome fields empty. Export anyway?')) {
-            return;
-        }
+        if (!confirm('بعض الحقول فارغة. متابعة؟')) return;
     }
     
-    showLoading('جاري إنشاء PDF... | Creating PDF...');
+    showLoading('جاري إنشاء ملف Excel...');
+    
+    try {
+        const data = collectExcelData();
+        const wb = XLSX.utils.book_new();
+        
+        // Main sheet
+        const wsData = createExcelData(data);
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        ws['!cols'] = [{ wch: 25 }, { wch: 35 }, { wch: 10 }, { wch: 40 }];
+        XLSX.utils.book_append_sheet(wb, ws, 'Vehicle Evaluation');
+        
+        // Summary sheet
+        const summaryData = createSummaryData(data);
+        const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+        wsSummary['!cols'] = [{ wch: 20 }, { wch: 40 }];
+        XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+        
+        const formNumber = document.getElementById('formNumber').value || 'form';
+        const date = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(wb, `Vehicle_Evaluation_${formNumber}_${date}.xlsx`);
+        
+        hideLoading();
+        showNotification('تم تصدير Excel بنجاح! 📊', 'success');
+    } catch (error) {
+        console.error('Excel Export Error:', error);
+        hideLoading();
+        showNotification('حدث خطأ أثناء التصدير', 'error');
+    }
+}
+
+function exportAllToExcel() {
+    const vehicles = getVehicles();
+    if (vehicles.length === 0) {
+        showNotification('لا توجد مركبات للتصدير', 'warning');
+        return;
+    }
+    
+    showLoading('جاري تصدير جميع المركبات...');
+    
+    try {
+        const wb = XLSX.utils.book_new();
+        
+        // Create summary sheet with all vehicles
+        const allData = [
+            ['REPOSSESSED VEHICLES REPORT'],
+            [`Generated: ${new Date().toLocaleString()}`],
+            [`Total Vehicles: ${vehicles.length}`],
+            [''],
+            ['Form Number', 'Customer', 'Make', 'Model', 'Year', 'VIN', 'Market Value', 'Rating', 'Recommendation', 'Date']
+        ];
+        
+        vehicles.forEach(v => {
+            allData.push([
+                v.formNumber || '',
+                v.customerName || '',
+                v.make || '',
+                v.model || '',
+                v.year || '',
+                v.vin || '',
+                v.marketValue || '',
+                getRatingText(v.overallRating),
+                getRecommendationText(v.recommendation),
+                v.evaluationDate || ''
+            ]);
+        });
+        
+        const ws = XLSX.utils.aoa_to_sheet(allData);
+        ws['!cols'] = [
+            { wch: 15 }, { wch: 20 }, { wch: 12 }, { wch: 12 }, { wch: 6 },
+            { wch: 20 }, { wch: 12 }, { wch: 10 }, { wch: 15 }, { wch: 12 }
+        ];
+        XLSX.utils.book_append_sheet(wb, ws, 'All Vehicles');
+        
+        const date = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(wb, `All_Vehicles_${date}.xlsx`);
+        
+        hideLoading();
+        showNotification(`تم تصدير ${vehicles.length} مركبة بنجاح! 📊`, 'success');
+    } catch (error) {
+        console.error('Export All Error:', error);
+        hideLoading();
+        showNotification('حدث خطأ أثناء التصدير', 'error');
+    }
+}
+
+async function exportToPDF() {
+    if (!validateForm(false)) {
+        if (!confirm('بعض الحقول فارغة. متابعة؟')) return;
+    }
+    
+    showLoading('جاري إنشاء ملف PDF...');
     
     try {
         const { jsPDF } = window.jspdf;
-        const data = collectFormData();
-        const formNumber = data.formNumber || 'form';
+        const data = collectExcelData();
+        const formNumber = document.getElementById('formNumber').value || 'form';
         const date = new Date().toISOString().split('T')[0];
         
         const pdf = new jsPDF('p', 'mm', 'a4');
@@ -613,51 +559,7 @@ async function exportToPDF() {
         const margin = 15;
         let y = margin;
         
-        // Helper functions
-        const addRow = (label, value, labelWidth = 60) => {
-            if (y > pageHeight - margin - 10) {
-                pdf.addPage();
-                y = margin;
-            }
-            pdf.setFontSize(10);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(label + ':', margin, y);
-            pdf.setFont('helvetica', 'normal');
-            
-            const valueText = String(value || 'N/A');
-            const valueLines = pdf.splitTextToSize(valueText, pageWidth - margin - labelWidth - 10);
-            valueLines.forEach((line, index) => {
-                if (index === 0) {
-                    pdf.text(line, margin + labelWidth, y);
-                } else {
-                    y += 5;
-                    if (y > pageHeight - margin) {
-                        pdf.addPage();
-                        y = margin;
-                    }
-                    pdf.text(line, margin + labelWidth, y);
-                }
-            });
-            y += 7;
-        };
-        
-        const addSectionHeader = (title) => {
-            if (y > pageHeight - margin - 20) {
-                pdf.addPage();
-                y = margin;
-            }
-            y += 5;
-            pdf.setFillColor(26, 95, 122);
-            pdf.rect(margin, y - 5, pageWidth - 2 * margin, 8, 'F');
-            pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(11);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(title, margin + 3, y);
-            pdf.setTextColor(0, 0, 0);
-            y += 10;
-        };
-        
-        // Title
+        // Header
         pdf.setFillColor(26, 95, 122);
         pdf.rect(0, 0, pageWidth, 25, 'F');
         pdf.setTextColor(255, 255, 255);
@@ -669,321 +571,321 @@ async function exportToPDF() {
         pdf.setTextColor(0, 0, 0);
         y = 35;
         
-        // Basic Information
-        addSectionHeader('BASIC INFORMATION');
-        addRow('Contract Number', data.contractNo);
-        addRow('Customer Name', data.customerName);
-        addRow('Vehicle Make', data.make);
-        addRow('Vehicle Model', data.model);
-        addRow('Year', data.year);
-        addRow('VIN', data.vin);
-        addRow('Plate Number', data.plateNo);
-        addRow('Odometer', data.odometer ? `${data.odometer} km` : 'N/A');
-        addRow('Color', data.color);
-        addRow('Fuel Type', getFuelTypeText(data.fuelType));
-        addRow('Repo Date', data.repoDate);
-        addRow('Repo Location', data.repoLocation);
+        // Helper functions
+        const addSection = (title) => {
+            if (y > pageHeight - 30) { pdf.addPage(); y = margin; }
+            y += 5;
+            pdf.setFillColor(26, 95, 122);
+            pdf.rect(margin, y - 5, pageWidth - 2 * margin, 8, 'F');
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(11);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(title, margin + 3, y);
+            pdf.setTextColor(0, 0, 0);
+            y += 10;
+        };
         
-        // Technical Evaluation
-        addSectionHeader('TECHNICAL EVALUATION');
-        ['body', 'tires', 'lights', 'seats', 'glass'].forEach(item => {
-            const rating = data[item] || 'N/A';
-            const notes = data[item + 'Notes'];
-            addRow(getItemName(item), getRatingText(rating));
-            if (notes) addRow('  Notes', notes);
-        });
+        const addRow = (label, value) => {
+            if (y > pageHeight - 15) { pdf.addPage(); y = margin; }
+            pdf.setFontSize(10);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(label + ':', margin, y);
+            pdf.setFont('helvetica', 'normal');
+            const valueText = String(value || 'N/A');
+            pdf.text(valueText, margin + 55, y);
+            y += 6;
+        };
         
-        // Damage Assessment
-        addSectionHeader('DAMAGE ASSESSMENT');
-        const damages = Array.isArray(data.damages) ? data.damages : (data.damages ? [data.damages] : []);
-        addRow('Damages Found', damages.length > 0 ? damages.map(d => getDamageText(d)).join(', ') : 'None');
-        if (data.damageDetails) addRow('Details', data.damageDetails);
+        // Content sections
+        addSection('BASIC INFORMATION');
+        addRow('Contract Number', data['Contract Number']);
+        addRow('Customer Name', data['Customer Name']);
+        addRow('Vehicle', `${data['Year']} ${data['Vehicle Make']} ${data['Vehicle Model']}`);
+        addRow('VIN', data['VIN']);
+        addRow('Plate Number', data['Plate Number']);
+        addRow('Odometer', data['Odometer (km)'] ? `${data['Odometer (km)']} km` : 'N/A');
+        addRow('Color', data['Color']);
+        addRow('Fuel Type', data['Fuel Type']);
+        addRow('Repo Date', data['Repo Date']);
+        addRow('Repo Location', data['Repo Location']);
         
-        // Accessories
-        addSectionHeader('ACCESSORIES & EQUIPMENT');
-        const accessories = Array.isArray(data.accessories) ? data.accessories : (data.accessories ? [data.accessories] : []);
-        addRow('Items Present', accessories.length > 0 ? accessories.map(a => getAccessoryText(a)).join(', ') : 'None');
-        if (data.keysCount) addRow('Number of Keys', data.keysCount);
+        addSection('TECHNICAL EVALUATION');
+        addRow('Body Condition', data['Body Condition']);
+        addRow('Tires Condition', data['Tires Condition']);
+        addRow('Lights Condition', data['Lights Condition']);
+        addRow('Seats Condition', data['Seats Condition']);
+        addRow('Glass Condition', data['Glass Condition']);
         
-        // Financial Valuation
-        addSectionHeader('FINANCIAL VALUATION');
-        addRow('Market Value', data.marketValue ? `${data.marketValue} SAR` : 'N/A');
+        addSection('DAMAGE ASSESSMENT');
+        addRow('Damages Found', data['Damages Found']);
+        if (data['Damage Details']) addRow('Details', data['Damage Details']);
         
-        // Overall Assessment
-        addSectionHeader('OVERALL ASSESSMENT');
-        addRow('Overall Rating', getRatingText(data.overallRating));
-        addRow('Recommendation', getRecommendationText(data.recommendation));
-        if (data.additionalNotes) addRow('Additional Notes', data.additionalNotes);
+        addSection('ACCESSORIES');
+        addRow('Items Present', data['Accessories Present']);
+        addRow('Keys Count', data['Number of Keys']);
         
-        // Evaluator Info
-        addSectionHeader('EVALUATOR INFORMATION');
-        addRow('Evaluator Name', data.evaluatorName);
-        addRow('Employee ID', data.evaluatorId);
-        addRow('Evaluation Date', data.evaluationDate);
+        addSection('VALUATION & ASSESSMENT');
+        addRow('Market Value', data['Estimated Market Value (SAR)'] ? `${data['Estimated Market Value (SAR)']} SAR` : 'N/A');
+        addRow('Overall Rating', data['Overall Rating']);
+        addRow('Recommendation', data['Recommendation']);
+        if (data['Additional Notes']) addRow('Notes', data['Additional Notes']);
         
-        // Add images if available
-        const hasPhotos = ['photo1', 'photo2', 'photo3'].some(id => {
-            const input = document.getElementById(id);
-            return input && input.files && input.files[0];
-        });
+        addSection('EVALUATOR');
+        addRow('Name', data['Evaluator Name']);
+        addRow('ID', data['Evaluator ID']);
+        addRow('Date', data['Evaluation Date']);
         
-        if (hasPhotos || data.photos) {
-            pdf.addPage();
-            y = margin;
-            addSectionHeader('VEHICLE PHOTOS');
-            
-            let photoX = margin;
-            let photoCount = 0;
-            const photoWidth = (pageWidth - 3 * margin) / 2;
-            const photoHeight = 60;
-            
-            for (let i = 1; i <= 3; i++) {
-                const photoData = data.photos?.[`photo${i}`];
-                if (photoData) {
-                    if (photoCount > 0 && photoCount % 2 === 0) {
-                        y += photoHeight + 10;
-                        photoX = margin;
-                    }
-                    
-                    if (y + photoHeight > pageHeight - margin) {
-                        pdf.addPage();
-                        y = margin;
-                        photoX = margin;
-                    }
-                    
-                    try {
-                        pdf.addImage(photoData, 'JPEG', photoX, y, photoWidth, photoHeight);
-                        photoX += photoWidth + margin;
-                        photoCount++;
-                    } catch (e) {
-                        console.error('Error adding image:', e);
-                    }
-                }
-            }
-        }
-        
-        // Footer on all pages
+        // Footer
         const totalPages = pdf.internal.getNumberOfPages();
         for (let i = 1; i <= totalPages; i++) {
             pdf.setPage(i);
             pdf.setFontSize(8);
             pdf.setTextColor(128, 128, 128);
             pdf.text(`Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
-            pdf.text(`Generated: ${new Date().toLocaleString()}`, pageWidth - margin, pageHeight - 5, { align: 'right' });
         }
         
-        // Save PDF
-        const fileName = `Vehicle_Evaluation_${formNumber}_${date}.pdf`;
-        pdf.save(fileName);
-        
+        pdf.save(`Vehicle_Evaluation_${formNumber}_${date}.pdf`);
         hideLoading();
-        showNotification('تم تصدير PDF بنجاح! | PDF exported successfully!', 'success');
-        
+        showNotification('تم تصدير PDF بنجاح! 📄', 'success');
     } catch (error) {
         console.error('PDF Export Error:', error);
         hideLoading();
-        showNotification('حدث خطأ أثناء إنشاء PDF | Error creating PDF', 'error');
+        showNotification('حدث خطأ أثناء التصدير', 'error');
     }
 }
 
-/**
- * Export to Excel
- */
-function exportToExcel() {
-    if (!validateForm(false)) {
-        if (!confirm('بعض الحقول فارغة. هل تريد التصدير على أي حال؟\nSome fields empty. Export anyway?')) {
-            return;
-        }
-    }
-    
-    showLoading('جاري إنشاء Excel... | Creating Excel...');
-    
-    try {
-        const data = collectFormData();
-        const formNumber = data.formNumber || 'form';
-        const date = new Date().toISOString().split('T')[0];
-        
-        // Create workbook
-        const wb = XLSX.utils.book_new();
-        
-        // Prepare data array
-        const wsData = [
-            ['REPOSSESSED VEHICLE EVALUATION REPORT'],
-            [''],
-            ['=== BASIC INFORMATION ==='],
-            ['Form Number', data.formNumber],
-            ['Contract Number', data.contractNo],
-            ['Customer Name', data.customerName],
-            ['Vehicle Make', data.make],
-            ['Vehicle Model', data.model],
-            ['Year', data.year],
-            ['Plate Number', data.plateNo],
-            ['VIN', data.vin],
-            ['Odometer (km)', data.odometer],
-            ['Color', data.color],
-            ['Repo Date', data.repoDate],
-            ['Repo Location', data.repoLocation],
-            ['Fuel Type', getFuelTypeText(data.fuelType)],
-            [''],
-            ['=== TECHNICAL EVALUATION ==='],
-            ['Body Condition', getRatingText(data.body), 'Notes:', data.bodyNotes || ''],
-            ['Tires Condition', getRatingText(data.tires), 'Notes:', data.tiresNotes || ''],
-            ['Lights Condition', getRatingText(data.lights), 'Notes:', data.lightsNotes || ''],
-            ['Seats Condition', getRatingText(data.seats), 'Notes:', data.seatsNotes || ''],
-            ['Glass Condition', getRatingText(data.glass), 'Notes:', data.glassNotes || ''],
-            [''],
-            ['=== DAMAGE ASSESSMENT ==='],
-            ['Damages Found', getDamagesText(data)],
-            ['Damage Details', data.damageDetails || ''],
-            [''],
-            ['=== ACCESSORIES ==='],
-            ['Accessories Present', getAccessoriesText(data)],
-            ['Number of Keys', data.keysCount || ''],
-            [''],
-            ['=== FINANCIAL VALUATION ==='],
-            ['Estimated Market Value (SAR)', data.marketValue || ''],
-            [''],
-            ['=== OVERALL ASSESSMENT ==='],
-            ['Overall Rating', getRatingText(data.overallRating)],
-            ['Recommendation', getRecommendationText(data.recommendation)],
-            ['Additional Notes', data.additionalNotes || ''],
-            [''],
-            ['=== EVALUATOR INFORMATION ==='],
-            ['Evaluator Name', data.evaluatorName || ''],
-            ['Employee ID', data.evaluatorId || ''],
-            ['Evaluation Date', data.evaluationDate || ''],
-            [''],
-            ['Report Generated:', new Date().toLocaleString()]
-        ];
-        
-        const ws = XLSX.utils.aoa_to_sheet(wsData);
-        
-        // Set column widths
-        ws['!cols'] = [
-            { wch: 25 },
-            { wch: 30 },
-            { wch: 10 },
-            { wch: 40 }
-        ];
-        
-        XLSX.utils.book_append_sheet(wb, ws, 'Vehicle Evaluation');
-        
-        // Summary sheet
-        const summaryData = [
-            ['Field', 'Value'],
-            ['Form Number', data.formNumber],
-            ['Contract Number', data.contractNo],
-            ['Customer Name', data.customerName],
-            ['Vehicle', `${data.year} ${data.make} ${data.model}`],
-            ['VIN', data.vin],
-            ['Market Value (SAR)', data.marketValue],
-            ['Overall Rating', getRatingText(data.overallRating)],
-            ['Recommendation', getRecommendationText(data.recommendation)],
-            ['Evaluation Date', data.evaluationDate]
-        ];
-        
-        const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-        wsSummary['!cols'] = [{ wch: 20 }, { wch: 40 }];
-        XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
-        
-        const fileName = `Vehicle_Evaluation_${formNumber}_${date}.xlsx`;
-        XLSX.writeFile(wb, fileName);
-        
-        hideLoading();
-        showNotification('تم تصدير Excel بنجاح! | Excel exported successfully!', 'success');
-        
-    } catch (error) {
-        console.error('Excel Export Error:', error);
-        hideLoading();
-        showNotification('حدث خطأ أثناء إنشاء Excel | Error creating Excel', 'error');
-    }
-}
-
-/**
- * Export to JSON
- */
 function exportToJSON() {
     const data = collectFormData();
-    const formNumber = data.formNumber || 'form';
+    data.exportedAt = new Date().toISOString();
+    
+    const formNumber = document.getElementById('formNumber').value || 'form';
     const date = new Date().toISOString().split('T')[0];
+    const fileName = `Vehicle_Evaluation_${formNumber}_${date}.json`;
     
-    const dataStr = JSON.stringify(data, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
     
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Vehicle_Evaluation_${formNumber}_${date}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    showNotification('تم تنزيل JSON بنجاح! | JSON downloaded successfully!', 'success');
+    showNotification('تم تصدير JSON بنجاح! 💾', 'success');
 }
 
-/**
- * Import from JSON
- */
-function importFromJSON(input) {
-    const file = input.files[0];
-    if (!file) return;
+// ===== Excel Data Helpers =====
+function collectExcelData() {
+    const form = document.getElementById('vehicleEvaluationForm');
+    const formNumber = document.getElementById('formNumber').value;
     
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            loadFormData(data);
-            showNotification('تم استيراد البيانات بنجاح! | Data imported successfully!', 'success');
-        } catch (error) {
-            console.error('Import Error:', error);
-            showNotification('ملف غير صالح | Invalid file', 'error');
-        }
+    const getRadioValue = (name) => {
+        const selected = form.querySelector(`input[name="${name}"]:checked`);
+        return selected ? selected.value : '';
     };
-    reader.readAsText(file);
+    
+    const getCheckboxValues = (name) => {
+        const checked = form.querySelectorAll(`input[name="${name}"]:checked`);
+        return Array.from(checked).map(cb => cb.value);
+    };
+    
+    return {
+        'Form Number': formNumber,
+        'Contract Number': form.elements['contractNo']?.value || '',
+        'Customer Name': form.elements['customerName']?.value || '',
+        'Vehicle Make': form.elements['make']?.value || '',
+        'Vehicle Model': form.elements['model']?.value || '',
+        'Year': form.elements['year']?.value || '',
+        'Plate Number': form.elements['plateNo']?.value || '',
+        'VIN': form.elements['vin']?.value || '',
+        'Odometer (km)': form.elements['odometer']?.value || '',
+        'Color': form.elements['color']?.value || '',
+        'Repo Date': form.elements['repoDate']?.value || '',
+        'Repo Location': form.elements['repoLocation']?.value || '',
+        'Fuel Type': getFuelTypeText(form.elements['fuelType']?.value),
+        'Body Condition': getRatingText(getRadioValue('body')),
+        'Body Notes': form.elements['bodyNotes']?.value || '',
+        'Tires Condition': getRatingText(getRadioValue('tires')),
+        'Tires Notes': form.elements['tiresNotes']?.value || '',
+        'Lights Condition': getRatingText(getRadioValue('lights')),
+        'Lights Notes': form.elements['lightsNotes']?.value || '',
+        'Seats Condition': getRatingText(getRadioValue('seats')),
+        'Seats Notes': form.elements['seatsNotes']?.value || '',
+        'Glass Condition': getRatingText(getRadioValue('glass')),
+        'Glass Notes': form.elements['glassNotes']?.value || '',
+        'Damages Found': getCheckboxValues('damages').map(getDamageText).join(', ') || 'None',
+        'Damage Details': form.elements['damageDetails']?.value || '',
+        'Accessories Present': getCheckboxValues('accessories').map(getAccessoryText).join(', ') || 'None',
+        'Number of Keys': form.elements['keysCount']?.value || '',
+        'Estimated Market Value (SAR)': form.elements['marketValue']?.value || '',
+        'Overall Rating': getRatingText(getRadioValue('overallRating')),
+        'Recommendation': getRecommendationText(getRadioValue('recommendation')),
+        'Additional Notes': form.elements['additionalNotes']?.value || '',
+        'Evaluator Name': form.elements['evaluatorName']?.value || '',
+        'Evaluator ID': form.elements['evaluatorId']?.value || '',
+        'Evaluation Date': form.elements['evaluationDate']?.value || ''
+    };
 }
 
-// ===== Helper Functions =====
+function createExcelData(data) {
+    return [
+        ['REPOSSESSED VEHICLE EVALUATION REPORT'],
+        [''],
+        ['=== BASIC INFORMATION ==='],
+        ['Form Number', data['Form Number']],
+        ['Contract Number', data['Contract Number']],
+        ['Customer Name', data['Customer Name']],
+        ['Vehicle Make', data['Vehicle Make']],
+        ['Vehicle Model', data['Vehicle Model']],
+        ['Year', data['Year']],
+        ['Plate Number', data['Plate Number']],
+        ['VIN', data['VIN']],
+        ['Odometer (km)', data['Odometer (km)']],
+        ['Color', data['Color']],
+        ['Fuel Type', data['Fuel Type']],
+        ['Repo Date', data['Repo Date']],
+        ['Repo Location', data['Repo Location']],
+        [''],
+        ['=== TECHNICAL EVALUATION ==='],
+        ['Body Condition', data['Body Condition'], 'Notes:', data['Body Notes']],
+        ['Tires Condition', data['Tires Condition'], 'Notes:', data['Tires Notes']],
+        ['Lights Condition', data['Lights Condition'], 'Notes:', data['Lights Notes']],
+        ['Seats Condition', data['Seats Condition'], 'Notes:', data['Seats Notes']],
+        ['Glass Condition', data['Glass Condition'], 'Notes:', data['Glass Notes']],
+        [''],
+        ['=== DAMAGE ASSESSMENT ==='],
+        ['Damages Found', data['Damages Found']],
+        ['Damage Details', data['Damage Details']],
+        [''],
+        ['=== ACCESSORIES ==='],
+        ['Accessories Present', data['Accessories Present']],
+        ['Number of Keys', data['Number of Keys']],
+        [''],
+        ['=== VALUATION ==='],
+        ['Estimated Market Value (SAR)', data['Estimated Market Value (SAR)']],
+        [''],
+        ['=== OVERALL ASSESSMENT ==='],
+        ['Overall Rating', data['Overall Rating']],
+        ['Recommendation', data['Recommendation']],
+        ['Additional Notes', data['Additional Notes']],
+        [''],
+        ['=== EVALUATOR ==='],
+        ['Evaluator Name', data['Evaluator Name']],
+        ['Evaluator ID', data['Evaluator ID']],
+        ['Evaluation Date', data['Evaluation Date']],
+        [''],
+        ['Report Generated:', new Date().toLocaleString()]
+    ];
+}
 
-/**
- * Show loading overlay
- */
-function showLoading(message) {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) {
-        overlay.style.display = 'flex';
+function createSummaryData(data) {
+    return [
+        ['Field', 'Value'],
+        ['Form Number', data['Form Number']],
+        ['Customer', data['Customer Name']],
+        ['Vehicle', `${data['Year']} ${data['Vehicle Make']} ${data['Vehicle Model']}`],
+        ['VIN', data['VIN']],
+        ['Market Value', data['Estimated Market Value (SAR)']],
+        ['Overall Rating', data['Overall Rating']],
+        ['Recommendation', data['Recommendation']],
+        ['Evaluation Date', data['Evaluation Date']],
+        ['Evaluator', data['Evaluator Name']]
+    ];
+}
+
+// ===== Text Converters =====
+function getRatingText(value) {
+    const map = { 'excellent': 'Excellent', 'good': 'Good', 'fair': 'Fair', 'poor': 'Poor' };
+    return map[value] || value || 'N/A';
+}
+
+function getRecommendationText(value) {
+    const map = { 'sell_as_is': 'Sell As-Is', 'repair_sell': 'Repair & Sell', 'auction': 'Auction', 'scrap': 'Scrap' };
+    return map[value] || value || 'N/A';
+}
+
+function getFuelTypeText(value) {
+    const map = { 'petrol': 'Petrol', 'diesel': 'Diesel', 'hybrid': 'Hybrid', 'electric': 'Electric' };
+    return map[value] || value || 'N/A';
+}
+
+function getDamageText(value) {
+    const map = {
+        'scratches': 'Scratches', 'dents': 'Dents', 'rust': 'Rust',
+        'cracked_glass': 'Cracked Glass', 'missing_parts': 'Missing Parts', 'accident_damage': 'Accident Damage'
+    };
+    return map[value] || value;
+}
+
+function getAccessoryText(value) {
+    const map = {
+        'spare_tire': 'Spare Tire', 'jack': 'Jack', 'tools': 'Tool Kit',
+        'first_aid': 'First Aid Kit', 'fire_extinguisher': 'Fire Extinguisher',
+        'manual': "Owner's Manual", 'keys': 'Keys', 'registration': 'Registration'
+    };
+    return map[value] || value;
+}
+
+// ===== Utility Functions =====
+function printForm() {
+    window.print();
+}
+
+function confirmReset() {
+    if (confirm('هل أنت متأكد من مسح جميع البيانات؟\nAre you sure you want to clear all data?')) {
+        resetForm(true);
     }
 }
 
-/**
- * Hide loading overlay
- */
+function resetForm(showMessage = true) {
+    document.getElementById('vehicleEvaluationForm').reset();
+    currentVehicleId = null;
+    localStorage.removeItem('autoSaveData');
+    
+    // Clear photos
+    for (let i = 1; i <= 3; i++) {
+        removePhoto(i);
+    }
+    
+    // Clear validation errors
+    document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+    document.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+    
+    generateFormNumber();
+    setDefaultDate();
+    
+    if (showMessage) {
+        showNotification('تم مسح النموذج', 'info');
+    }
+}
+
+function showLoading(text = 'جاري المعالجة...') {
+    document.getElementById('loadingText').textContent = text;
+    document.getElementById('loadingOverlay').classList.remove('hidden');
+}
+
 function hideLoading() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) {
-        overlay.style.display = 'none';
-    }
+    document.getElementById('loadingOverlay').classList.add('hidden');
 }
 
-/**
- * Show notification
- */
 function showNotification(message, type = 'info') {
     const container = document.getElementById('notificationContainer');
-    if (!container) return;
+    
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
     
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
-    
-    const icon = type === 'success' ? 'fa-check-circle' :
-                 type === 'error' ? 'fa-exclamation-circle' :
-                 type === 'warning' ? 'fa-exclamation-triangle' :
-                 'fa-info-circle';
-    
     notification.innerHTML = `
-        <i class="fas ${icon}"></i>
+        <i class="fas ${icons[type]}"></i>
         <span>${message}</span>
-        <button class="close-btn" onclick="this.parentElement.remove()">
+        <button class="notification-close" onclick="this.parentElement.remove()">
             <i class="fas fa-times"></i>
         </button>
     `;
@@ -991,130 +893,8 @@ function showNotification(message, type = 'info') {
     container.appendChild(notification);
     
     setTimeout(() => {
-        notification.style.animation = 'slideDown 0.3s ease reverse';
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(-20px)';
         setTimeout(() => notification.remove(), 300);
-    }, 5000);
+    }, 4000);
 }
-
-/**
- * Debounce function
- */
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-/**
- * Toggle keys count field
- */
-function toggleKeysCount() {
-    const keysCheckbox = document.querySelector('input[name="accessories"][value="keys"]');
-    const keysCountContainer = document.getElementById('keysCountContainer');
-    
-    if (keysCheckbox && keysCountContainer) {
-        keysCountContainer.style.display = keysCheckbox.checked ? 'block' : 'none';
-    }
-}
-
-// ===== Text Translation Functions =====
-
-function getRatingText(value) {
-    const ratings = {
-        'excellent': 'Excellent',
-        'good': 'Good',
-        'fair': 'Fair',
-        'poor': 'Poor'
-    };
-    return ratings[value] || value || 'N/A';
-}
-
-function getRecommendationText(value) {
-    const recommendations = {
-        'sell_as_is': 'Sell As-Is',
-        'repair_sell': 'Repair & Sell',
-        'auction': 'Auction',
-        'scrap': 'Scrap'
-    };
-    return recommendations[value] || value || 'N/A';
-}
-
-function getFuelTypeText(value) {
-    const fuelTypes = {
-        'petrol': 'Petrol',
-        'diesel': 'Diesel',
-        'hybrid': 'Hybrid',
-        'electric': 'Electric'
-    };
-    return fuelTypes[value] || value || 'N/A';
-}
-
-function getItemName(item) {
-    const items = {
-        'body': 'Body Condition',
-        'tires': 'Tires Condition',
-        'lights': 'Lights Condition',
-        'seats': 'Seats Condition',
-        'glass': 'Glass Condition'
-    };
-    return items[item] || item;
-}
-
-function getDamageText(value) {
-    const damages = {
-        'scratches': 'Scratches',
-        'dents': 'Dents',
-        'rust': 'Rust',
-        'cracked_glass': 'Cracked Glass',
-        'missing_parts': 'Missing Parts',
-        'accident_damage': 'Accident Damage'
-    };
-    return damages[value] || value;
-}
-
-function getAccessoryText(value) {
-    const accessories = {
-        'spare_tire': 'Spare Tire',
-        'jack': 'Jack',
-        'tools': 'Tool Kit',
-        'first_aid': 'First Aid Kit',
-        'fire_extinguisher': 'Fire Extinguisher',
-        'manual': "Owner's Manual",
-        'keys': 'Keys',
-        'registration': 'Registration'
-    };
-    return accessories[value] || value;
-}
-
-function getDamagesText(data) {
-    const damages = Array.isArray(data.damages) ? data.damages : (data.damages ? [data.damages] : []);
-    return damages.length > 0 ? damages.map(d => getDamageText(d)).join(', ') : 'None';
-}
-
-function getAccessoriesText(data) {
-    const accessories = Array.isArray(data.accessories) ? data.accessories : (data.accessories ? [data.accessories] : []);
-    return accessories.length > 0 ? accessories.map(a => getAccessoryText(a)).join(', ') : 'None';
-}
-
-/**
- * Read file as Data URL
- */
-function readFileAsDataURL(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = (e) => reject(e);
-        reader.readAsDataURL(file);
-    });
-}
-
-// ===== Console greeting =====
-console.log('%c🚗 Vehicle Evaluation System v2.0', 'font-size: 20px; color: #667eea; font-weight: bold;');
-console.log('%cEnhanced with: Auto-save • Dark Mode • Advanced Export', 'color: #10b981;');
-console.log('%cDeveloped with ❤️ in Saudi Arabia', 'color: #ef4444;');

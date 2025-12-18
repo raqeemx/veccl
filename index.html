@@ -15,11 +15,29 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+        }
+
         body {
             font-family: 'Cairo', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             min-height: 100vh;
             padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         }
 
         .container {
@@ -27,6 +45,7 @@
             margin: 0 auto;
         }
 
+        /* Header */
         .main-header {
             background: white;
             padding: 25px;
@@ -40,12 +59,79 @@
             gap: 15px;
         }
 
+        body.dark-mode .main-header {
+            background: #1f2937;
+            color: white;
+        }
+
         .main-header h1 {
             font-size: 1.8rem;
-            color: #667eea;
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 15px;
+        }
+
+        body.dark-mode .main-header h1 {
+            color: #a5b4fc;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .dark-mode-toggle {
+            background: var(--gray-100);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.dark-mode .dark-mode-toggle {
+            background: #374151;
+            color: #fbbf24;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .auto-save-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            padding: 8px 15px;
+            background: var(--gray-100);
+            border-radius: 20px;
+        }
+
+        body.dark-mode .auto-save-indicator {
+            background: #374151;
+            color: #9ca3af;
+        }
+
+        .auto-save-indicator .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .header-stats {
@@ -55,7 +141,7 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             padding: 15px 25px;
             border-radius: 10px;
@@ -74,6 +160,7 @@
             opacity: 0.9;
         }
 
+        /* Buttons */
         .action-buttons {
             background: white;
             padding: 20px;
@@ -84,6 +171,10 @@
             gap: 15px;
             flex-wrap: wrap;
             justify-content: center;
+        }
+
+        body.dark-mode .action-buttons {
+            background: #1f2937;
         }
 
         .btn {
@@ -106,31 +197,72 @@
             box-shadow: 0 6px 25px rgba(0,0,0,0.2);
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+
+        /* Search & Filter */
+        .search-filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        body.dark-mode .search-filter-section {
+            background: #1f2937;
+        }
+
+        .search-filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        body.dark-mode .filter-group label {
+            color: #9ca3af;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 10px 15px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .filter-group input,
+        body.dark-mode .filter-group select {
+            background: #374151;
+            border-color: #4b5563;
             color: white;
         }
 
-        .btn-success {
-            background: #10b981;
-            color: white;
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary);
         }
 
-        .btn-warning {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            color: white;
-        }
-
+        /* Vehicles Section */
         .vehicles-section {
             background: white;
             padding: 25px;
@@ -139,13 +271,22 @@
             margin-bottom: 25px;
         }
 
+        body.dark-mode .vehicles-section {
+            background: #1f2937;
+            color: white;
+        }
+
         .vehicles-section h2 {
             font-size: 1.5rem;
             margin-bottom: 20px;
-            color: #667eea;
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        body.dark-mode .vehicles-section h2 {
+            color: #a5b4fc;
         }
 
         .vehicles-grid {
@@ -155,17 +296,22 @@
         }
 
         .vehicle-card {
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--gray-200);
             border-radius: 12px;
             padding: 20px;
             background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
             transition: all 0.3s ease;
         }
 
+        body.dark-mode .vehicle-card {
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            border-color: #4b5563;
+        }
+
         .vehicle-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-color: #667eea;
+            border-color: var(--primary);
         }
 
         .vehicle-card .card-header {
@@ -174,13 +320,21 @@
             align-items: start;
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 2px solid #e5e7eb;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        body.dark-mode .vehicle-card .card-header {
+            border-color: #4b5563;
         }
 
         .vehicle-card .form-number {
             font-size: 1.1rem;
             font-weight: 700;
-            color: #667eea;
+            color: var(--primary);
+        }
+
+        body.dark-mode .vehicle-card .form-number {
+            color: #a5b4fc;
         }
 
         .vehicle-card .timestamp {
@@ -205,6 +359,10 @@
             font-weight: 600;
         }
 
+        body.dark-mode .vehicle-card .info-row .value {
+            color: #f3f4f6;
+        }
+
         .vehicle-photos {
             display: flex;
             gap: 8px;
@@ -213,18 +371,18 @@
         }
 
         .vehicle-photos img {
-            width: 100px;
-            height: 75px;
+            width: 80px;
+            height: 60px;
             object-fit: cover;
             border-radius: 6px;
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--gray-200);
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .vehicle-photos img:hover {
             transform: scale(1.05);
-            border-color: #667eea;
+            border-color: var(--primary);
         }
 
         .rating-badge {
@@ -236,71 +394,48 @@
             margin-top: 10px;
         }
 
-        .rating-excellent {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .rating-good {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .rating-fair {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .rating-poor {
-            background: #fee2e2;
-            color: #991b1b;
-        }
+        .rating-excellent { background: #d1fae5; color: #065f46; }
+        .rating-good { background: #dbeafe; color: #1e40af; }
+        .rating-fair { background: #fef3c7; color: #92400e; }
+        .rating-poor { background: #fee2e2; color: #991b1b; }
 
         .card-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             margin-top: 15px;
             padding-top: 15px;
-            border-top: 2px solid #e5e7eb;
+            border-top: 2px solid var(--gray-200);
+            flex-wrap: wrap;
+        }
+
+        body.dark-mode .card-actions {
+            border-color: #4b5563;
         }
 
         .card-actions button {
             flex: 1;
-            padding: 8px;
+            min-width: 60px;
+            padding: 8px 5px;
             border: none;
             border-radius: 6px;
             font-family: inherit;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .btn-view {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-edit {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-delete {
-            background: #ef4444;
-            color: white;
-        }
-
-        .btn-pdf {
-            background: #e74c3c;
-            color: white;
-        }
+        .btn-view { background: var(--primary); color: white; }
+        .btn-edit { background: var(--success); color: white; }
+        .btn-delete { background: var(--danger); color: white; }
+        .btn-pdf { background: #e74c3c; color: white; }
 
         .card-actions button:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
+        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -323,6 +458,7 @@
             margin-bottom: 25px;
         }
 
+        /* Form Section */
         .form-section {
             background: white;
             padding: 30px;
@@ -332,6 +468,11 @@
             display: none;
         }
 
+        body.dark-mode .form-section {
+            background: #1f2937;
+            color: white;
+        }
+
         .form-section.active {
             display: block;
         }
@@ -339,10 +480,14 @@
         .form-section h2 {
             font-size: 1.5rem;
             margin-bottom: 25px;
-            color: #667eea;
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        body.dark-mode .form-section h2 {
+            color: #a5b4fc;
         }
 
         .form-grid {
@@ -364,23 +509,45 @@
             font-size: 0.9rem;
         }
 
+        body.dark-mode .form-group label {
+            color: #d1d5db;
+        }
+
+        .form-group label.required::after {
+            content: ' *';
+            color: var(--danger);
+        }
+
         .form-group input,
         .form-group select,
         .form-group textarea {
             padding: 12px;
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--gray-200);
             border-radius: 8px;
             font-family: inherit;
             font-size: 1rem;
             transition: all 0.3s ease;
         }
 
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select,
+        body.dark-mode .form-group textarea {
+            background: #374151;
+            border-color: #4b5563;
+            color: white;
+        }
+
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: var(--danger);
+            background: #fef2f2;
         }
 
         .form-group textarea {
@@ -388,18 +555,28 @@
             min-height: 100px;
         }
 
+        /* Photos Upload */
         .photos-upload-section {
             margin: 25px 0;
             padding: 20px;
             background: #f9fafb;
             border-radius: 10px;
-            border: 2px dashed #e5e7eb;
+            border: 2px dashed var(--gray-200);
+        }
+
+        body.dark-mode .photos-upload-section {
+            background: #374151;
+            border-color: #4b5563;
         }
 
         .photos-upload-section h3 {
             font-size: 1.2rem;
             margin-bottom: 15px;
             color: #374151;
+        }
+
+        body.dark-mode .photos-upload-section h3 {
+            color: #f3f4f6;
         }
 
         .photos-upload-grid {
@@ -423,9 +600,18 @@
             overflow: hidden;
         }
 
+        body.dark-mode .photo-upload-box {
+            background: #1f2937;
+            border-color: #4b5563;
+        }
+
         .photo-upload-box:hover {
-            border-color: #667eea;
+            border-color: var(--primary);
             background: #f0f4ff;
+        }
+
+        body.dark-mode .photo-upload-box:hover {
+            background: #374151;
         }
 
         .photo-upload-box input {
@@ -463,7 +649,7 @@
             position: absolute;
             top: 5px;
             right: 5px;
-            background: #ef4444;
+            background: var(--danger);
             color: white;
             border: none;
             width: 28px;
@@ -487,9 +673,15 @@
             justify-content: center;
             margin-top: 30px;
             padding-top: 25px;
-            border-top: 2px solid #e5e7eb;
+            border-top: 2px solid var(--gray-200);
+            flex-wrap: wrap;
         }
 
+        body.dark-mode .form-actions-bottom {
+            border-color: #4b5563;
+        }
+
+        /* Notifications */
         .notification {
             position: fixed;
             top: 20px;
@@ -498,175 +690,258 @@
             background: white;
             padding: 15px 25px;
             border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: flex;
             align-items: center;
             gap: 15px;
             z-index: 1000;
-            min-width: 300px;
-            animation: slideDown 0.3s ease;
+            animation: slideIn 0.3s ease;
         }
 
-        .notification.show {
-            display: flex;
-        }
-
-        .notification.success {
-            border-left: 5px solid #10b981;
-        }
-
-        .notification.error {
-            border-left: 5px solid #ef4444;
-        }
-
-        .notification.info {
-            border-left: 5px solid #3b82f6;
-        }
-
-        @keyframes slideDown {
+        @keyframes slideIn {
             from {
-                transform: translateX(-50%) translateY(-100%);
                 opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
             }
             to {
-                transform: translateX(-50%) translateY(0);
                 opacity: 1;
+                transform: translateX(-50%) translateY(0);
             }
         }
 
-        .modal {
-            display: none;
+        .notification.success { border-right: 4px solid var(--success); }
+        .notification.error { border-right: 4px solid var(--danger); }
+        .notification.warning { border-right: 4px solid var(--warning); }
+        .notification.info { border-right: 4px solid var(--primary); }
+
+        .notification i {
+            font-size: 1.5rem;
+        }
+
+        .notification.success i { color: var(--success); }
+        .notification.error i { color: var(--danger); }
+        .notification.warning i { color: var(--warning); }
+        .notification.info i { color: var(--primary); }
+
+        /* Modal */
+        .modal-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.7);
-            z-index: 2000;
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
 
-        .modal.active {
-            display: flex;
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
 
         .modal-content {
             background: white;
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 600px;
-            width: 100%;
+            width: 90%;
+            max-width: 700px;
             max-height: 90vh;
-            overflow-y: auto;
+            border-radius: 15px;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .modal-content {
+            background: #1f2937;
+            color: white;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
         }
 
         .modal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e5e7eb;
         }
 
         .modal-header h3 {
             font-size: 1.3rem;
-            color: #667eea;
         }
 
-        .modal-close {
-            background: none;
+        .modal-header button {
+            background: rgba(255,255,255,0.2);
             border: none;
-            font-size: 1.5rem;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
             cursor: pointer;
-            color: #6b7280;
-            padding: 5px 10px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
         }
 
-        .modal-close:hover {
-            color: #ef4444;
+        .modal-header button:hover {
+            background: rgba(255,255,255,0.3);
         }
 
         .modal-body {
-            line-height: 1.8;
+            padding: 25px;
+            max-height: 60vh;
+            overflow-y: auto;
         }
 
-        .modal-body .detail-row {
+        .modal-photos {
             display: flex;
-            padding: 10px 0;
-            border-bottom: 1px solid #f3f4f6;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
 
-        .modal-body .detail-row .label {
-            flex: 0 0 40%;
+        .modal-photos img {
+            width: 150px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-photos img:hover {
+            transform: scale(1.05);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        body.dark-mode .detail-row {
+            border-color: #4b5563;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-row .label {
             font-weight: 600;
             color: #6b7280;
         }
 
-        .modal-body .detail-row .value {
-            flex: 1;
+        .detail-row .value {
             color: #111827;
         }
 
-        .modal-photos {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 15px 0;
+        body.dark-mode .detail-row .value {
+            color: #f3f4f6;
         }
 
-        .modal-photos img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 2px solid #e5e7eb;
-        }
-
-        .modal-photos img:hover {
-            border-color: #667eea;
-        }
-
-        .loading {
+        /* Loading */
+        .loading-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.7);
-            display: none;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 3000;
-            flex-direction: column;
-            gap: 20px;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
 
-        .loading.active {
-            display: flex;
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
 
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(255,255,255,0.3);
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-        }
-
-        .loading-text {
-            color: white;
-            font-size: 1.1rem;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
+        .loading-text {
+            color: white;
+            margin-top: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* Photo Modal */
+        .photo-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .photo-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .photo-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+        }
+
+        .photo-modal .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .photo-modal .close-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
+            .main-header {
+                flex-direction: column;
+                text-align: center;
             }
 
-            .vehicles-grid {
+            .header-stats {
+                justify-content: center;
+            }
+
+            .form-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -674,44 +949,89 @@
                 grid-template-columns: 1fr;
             }
 
-            .header-stats {
+            .vehicles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
                 width: 100%;
                 justify-content: center;
             }
 
-            .main-header h1 {
-                font-size: 1.3rem;
+            .card-actions {
+                flex-wrap: wrap;
             }
+
+            .card-actions button {
+                flex: 1 1 45%;
+            }
+        }
+
+        /* File Input Hidden */
+        .file-input-hidden {
+            display: none;
+        }
+
+        /* Periodic Auto-Save Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideOutDown {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        .periodic-save-toast {
+            direction: rtl;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        #autoSaveStatusBadge {
+            direction: rtl;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        #autoSaveStatusBadge:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         }
     </style>
 </head>
 <body>
-    <div class="loading" id="loading">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">جاري المعالجة...</div>
-    </div>
-
-    <div class="notification" id="notification">
-        <i class="fas fa-check-circle"></i>
-        <span id="notificationText"></span>
-    </div>
-
-    <div class="modal" id="viewModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-eye"></i> تفاصيل المركبة</h3>
-                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body" id="modalBody"></div>
-        </div>
-    </div>
-
     <div class="container">
-        <div class="main-header">
+        <!-- Header -->
+        <header class="main-header">
             <h1>
-                <i class="fas fa-car-side"></i>
+                <i class="fas fa-car"></i>
                 نظام تقييم المركبات المستردة
             </h1>
+            <div class="header-controls">
+                <div class="auto-save-indicator" id="saveIndicator">
+                    <span class="dot"></span>
+                    <span>محفوظ تلقائياً</span>
+                </div>
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="الوضع الليلي">
+                    <i class="fas fa-moon" id="darkModeIcon"></i>
+                </button>
+            </div>
             <div class="header-stats">
                 <div class="stat-card">
                     <span class="number" id="totalVehicles">0</span>
@@ -722,681 +1042,706 @@
                     <span class="label">القيمة الإجمالية (ر.س)</span>
                 </div>
             </div>
-        </div>
+        </header>
 
+        <!-- Action Buttons -->
         <div class="action-buttons">
             <button class="btn btn-primary" onclick="showForm()">
-                <i class="fas fa-plus"></i> إضافة مركبة جديدة
+                <i class="fas fa-plus"></i> إضافة مركبة
             </button>
             <button class="btn btn-success" onclick="exportAllToExcel()">
                 <i class="fas fa-file-excel"></i> تصدير Excel
             </button>
-            <button class="btn btn-secondary" onclick="exportAllPhotosHTML()">
+            <button class="btn btn-warning" onclick="exportCompleteData()">
+                <i class="fas fa-download"></i> تصدير كامل (JSON)
+            </button>
+            <button class="btn" style="background: #8b5cf6; color: white;" onclick="exportAllPhotosHTML()">
                 <i class="fas fa-images"></i> تصدير الصور
             </button>
-            <button class="btn btn-warning" onclick="clearAll()">
-                <i class="fas fa-trash-restore"></i> مسح الكل
+            <label class="btn btn-secondary" style="cursor: pointer;">
+                <i class="fas fa-upload"></i> استيراد بيانات
+                <input type="file" class="file-input-hidden" accept=".json" onchange="importCompleteData(event)">
+            </label>
+            <button class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;" onclick="manualTogglePeriodicSave()" id="periodicSaveToggleBtn">
+                <i class="fas fa-sync"></i> حفظ تلقائي دوري
+            </button>
+            <button class="btn btn-danger" onclick="clearAll()">
+                <i class="fas fa-trash"></i> حذف الكل
             </button>
         </div>
 
-        <div class="import-export-section">
-            <h3><i class="fas fa-exchange-alt"></i> استيراد وتصدير البيانات الكاملة</h3>
-            <div class="import-export-controls">
-                <button class="btn btn-success" onclick="exportCompleteData()">
-                    <i class="fas fa-download"></i> تصدير البيانات الكاملة (JSON)
-                </button>
-                <div class="file-input-wrapper">
-                    <input type="file" id="importFile" accept=".json" onchange="importCompleteData(event)">
-                    <label for="importFile" class="file-input-label">
-                        <i class="fas fa-upload"></i> استيراد البيانات الكاملة
-                    </label>
-                </div>
-                <button class="btn btn-info" onclick="toggleFilters()">
-                    <i class="fas fa-filter"></i> <span id="filterToggleText">إظهار الفلاتر</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="filter-section" id="filterSection" style="display: none;">
-            <h3><i class="fas fa-filter"></i> تصفية وترتيب المركبات</h3>
-            
-            <div class="filter-controls">
+        <!-- Search & Filter -->
+        <div class="search-filter-section">
+            <div class="search-filter-grid">
                 <div class="filter-group">
-                    <label>البحث | Search</label>
-                    <input type="text" id="searchFilter" placeholder="ابحث برقم العقد، العميل، VIN..." onkeyup="applyFilters()">
+                    <label><i class="fas fa-search"></i> بحث</label>
+                    <input type="text" id="searchInput" placeholder="ابحث بالاسم، VIN، رقم العقد..." oninput="applyFilters()">
                 </div>
-                
                 <div class="filter-group">
-                    <label>نوع المركبة | Make</label>
-                    <select id="makeFilter" onchange="applyFilters()">
-                        <option value="">الكل | All</option>
+                    <label><i class="fas fa-car"></i> نوع المركبة</label>
+                    <select id="filterMake" onchange="applyFilters()">
+                        <option value="">الكل</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
-                    <label>الموديل | Model</label>
-                    <select id="modelFilter" onchange="applyFilters()">
-                        <option value="">الكل | All</option>
+                    <label><i class="fas fa-car-side"></i> الموديل</label>
+                    <select id="filterModel" onchange="applyFilters()">
+                        <option value="">الكل</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
-                    <label>السنة | Year</label>
-                    <select id="yearFilter" onchange="applyFilters()">
-                        <option value="">الكل | All</option>
+                    <label><i class="fas fa-calendar"></i> السنة</label>
+                    <select id="filterYear" onchange="applyFilters()">
+                        <option value="">الكل</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
-                    <label>نوع الوقود | Fuel Type</label>
-                    <select id="fuelFilter" onchange="applyFilters()">
-                        <option value="">الكل | All</option>
-                        <option value="petrol">بنزين | Petrol</option>
-                        <option value="diesel">ديزل | Diesel</option>
-                        <option value="hybrid">هجين | Hybrid</option>
-                        <option value="electric">كهربائي | Electric</option>
+                    <label><i class="fas fa-gas-pump"></i> الوقود</label>
+                    <select id="filterFuel" onchange="applyFilters()">
+                        <option value="">الكل</option>
+                        <option value="petrol">بنزين</option>
+                        <option value="diesel">ديزل</option>
+                        <option value="hybrid">هجين</option>
+                        <option value="electric">كهربائي</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
-                    <label>التقييم | Rating</label>
-                    <select id="ratingFilter" onchange="applyFilters()">
-                        <option value="">الكل | All</option>
-                        <option value="excellent">ممتاز | Excellent</option>
-                        <option value="good">جيد | Good</option>
-                        <option value="fair">مقبول | Fair</option>
-                        <option value="poor">ضعيف | Poor</option>
+                    <label><i class="fas fa-palette"></i> اللون</label>
+                    <select id="filterColor" onchange="applyFilters()">
+                        <option value="">الكل</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
-                    <label>التوصية | Recommendation</label>
-                    <select id="recommendationFilter" onchange="applyFilters()">
-                        <option value="">الكل | All</option>
+                    <label><i class="fas fa-star"></i> التقييم</label>
+                    <select id="filterRating" onchange="applyFilters()">
+                        <option value="">الكل</option>
+                        <option value="excellent">ممتاز</option>
+                        <option value="good">جيد</option>
+                        <option value="fair">مقبول</option>
+                        <option value="poor">ضعيف</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-thumbs-up"></i> التوصية</label>
+                    <select id="filterRecommendation" onchange="applyFilters()">
+                        <option value="">الكل</option>
                         <option value="sell_as_is">البيع كما هي</option>
-                        <option value="repair_sell">الإصلاح ثم البيع</option>
+                        <option value="repair_sell">إصلاح ثم بيع</option>
                         <option value="auction">المزاد</option>
                         <option value="scrap">التخريد</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
-                    <label>اللون | Color</label>
-                    <select id="colorFilter" onchange="applyFilters()">
-                        <option value="">الكل | All</option>
+                    <label><i class="fas fa-sort"></i> ترتيب</label>
+                    <select id="sortBy" onchange="applyFilters()">
+                        <option value="newest">الأحدث أولاً</option>
+                        <option value="oldest">الأقدم أولاً</option>
+                        <option value="value-high">القيمة (الأعلى)</option>
+                        <option value="value-low">القيمة (الأقل)</option>
+                        <option value="year-high">السنة (الأحدث)</option>
+                        <option value="year-low">السنة (الأقدم)</option>
+                        <option value="make-asc">النوع (أ-ي)</option>
+                        <option value="customer-asc">العميل (أ-ي)</option>
                     </select>
                 </div>
-                
-                <div class="filter-group">
-                    <label>القيمة من | Value From</label>
-                    <input type="number" id="valueFromFilter" placeholder="0" onchange="applyFilters()">
-                </div>
-                
-                <div class="filter-group">
-                    <label>القيمة إلى | Value To</label>
-                    <input type="number" id="valueToFilter" placeholder="∞" onchange="applyFilters()">
-                </div>
             </div>
-
-            <div class="sort-section">
-                <label><i class="fas fa-sort"></i> ترتيب حسب | Sort by:</label>
-                <select id="sortBy" onchange="applyFilters()">
-                    <option value="timestamp-desc">الأحدث أولاً | Newest First</option>
-                    <option value="timestamp-asc">الأقدم أولاً | Oldest First</option>
-                    <option value="contractNo-asc">رقم العقد (تصاعدي) | Contract ↑</option>
-                    <option value="contractNo-desc">رقم العقد (تنازلي) | Contract ↓</option>
-                    <option value="customerName-asc">اسم العميل (أ-ي) | Customer A-Z</option>
-                    <option value="customerName-desc">اسم العميل (ي-أ) | Customer Z-A</option>
-                    <option value="make-asc">نوع المركبة (أ-ي) | Make A-Z</option>
-                    <option value="marketValue-desc">القيمة (الأعلى) | Value High-Low</option>
-                    <option value="marketValue-asc">القيمة (الأقل) | Value Low-High</option>
-                    <option value="year-desc">السنة (الأحدث) | Year Newest</option>
-                    <option value="year-asc">السنة (الأقدم) | Year Oldest</option>
-                </select>
-                
-                <div class="results-count" id="resultsCount">
-                    <i class="fas fa-car"></i>
-                    <span>0 مركبة</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--gray-200);">
+                <div id="resultsCount" style="font-size: 0.9rem; color: var(--gray-600);">
+                    <i class="fas fa-car"></i> <span>0 مركبة</span>
                 </div>
-            </div>
-
-            <div class="filter-actions">
-                <button class="btn btn-secondary" onclick="resetFilters()">
-                    <i class="fas fa-redo"></i> إعادة تعيين الفلاتر
+                <button type="button" class="btn btn-secondary" onclick="resetFilters()" style="padding: 8px 15px; font-size: 0.85rem;">
+                    <i class="fas fa-redo"></i> إعادة تعيين
                 </button>
-                <div id="activeFilters" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;"></div>
             </div>
         </div>
 
-        <div class="form-section" id="formSection">
-            <h2>
-                <i class="fas fa-edit"></i>
-                <span id="formTitle">إضافة مركبة جديدة</span>
-            </h2>
-            <form id="vehicleForm">
+        <!-- Vehicles List -->
+        <section class="vehicles-section">
+            <h2><i class="fas fa-list"></i> المركبات المحفوظة</h2>
+            <div class="vehicles-grid" id="vehiclesGrid">
+                <!-- Vehicle cards will be rendered here -->
+            </div>
+        </section>
+
+        <!-- Add/Edit Form -->
+        <section class="form-section" id="formSection">
+            <h2 id="formTitle"><i class="fas fa-edit"></i> إضافة مركبة جديدة</h2>
+            <form id="vehicleForm" onsubmit="event.preventDefault(); saveVehicle();">
                 <input type="hidden" id="editIndex" value="-1">
                 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>رقم العقد | Contract No. *</label>
-                        <input type="text" id="contractNo" required>
+                        <label class="required">رقم العقد</label>
+                        <input type="text" id="contractNo" required placeholder="أدخل رقم العقد">
                     </div>
                     <div class="form-group">
-                        <label>رقم الهيكل | VIN *</label>
-                        <input type="text" id="vin" maxlength="17" required>
+                        <label class="required">رقم الهيكل (VIN)</label>
+                        <input type="text" id="vin" required maxlength="17" placeholder="أدخل رقم VIN">
                     </div>
                     <div class="form-group">
-                        <label>اسم العميل | Customer Name *</label>
-                        <input type="text" id="customerName" required>
+                        <label class="required">اسم العميل</label>
+                        <input type="text" id="customerName" required placeholder="أدخل اسم العميل">
                     </div>
                     <div class="form-group">
-                        <label>نوع المركبة | Make *</label>
-                        <input type="text" id="make" required>
+                        <label class="required">نوع المركبة</label>
+                        <input type="text" id="make" required placeholder="مثال: تويوتا">
                     </div>
                     <div class="form-group">
-                        <label>الموديل | Model *</label>
-                        <input type="text" id="model" required>
+                        <label class="required">الموديل</label>
+                        <input type="text" id="model" required placeholder="مثال: كامري">
                     </div>
                     <div class="form-group">
-                        <label>سنة الصنع | Year *</label>
-                        <input type="number" id="year" min="1990" max="2030" required>
+                        <label class="required">سنة الصنع</label>
+                        <input type="number" id="year" required min="1990" max="2030" placeholder="مثال: 2020">
                     </div>
                     <div class="form-group">
-                        <label>رقم اللوحة | Plate No.</label>
-                        <input type="text" id="plateNo">
+                        <label>رقم اللوحة</label>
+                        <input type="text" id="plateNo" placeholder="أدخل رقم اللوحة">
                     </div>
                     <div class="form-group">
-                        <label>قراءة العداد | Odometer (km)</label>
-                        <input type="number" id="odometer">
+                        <label>قراءة العداد (كم)</label>
+                        <input type="number" id="odometer" placeholder="أدخل قراءة العداد">
                     </div>
                     <div class="form-group">
-                        <label>اللون | Color</label>
-                        <input type="text" id="color">
+                        <label>اللون</label>
+                        <input type="text" id="color" placeholder="أدخل لون المركبة">
                     </div>
                     <div class="form-group">
-                        <label>نوع الوقود | Fuel Type</label>
+                        <label>نوع الوقود</label>
                         <select id="fuelType">
                             <option value="">اختر...</option>
-                            <option value="petrol">بنزين | Petrol</option>
-                            <option value="diesel">ديزل | Diesel</option>
-                            <option value="hybrid">هجين | Hybrid</option>
-                            <option value="electric">كهربائي | Electric</option>
+                            <option value="petrol">بنزين</option>
+                            <option value="diesel">ديزل</option>
+                            <option value="hybrid">هجين</option>
+                            <option value="electric">كهربائي</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>تاريخ الاسترداد | Repo Date</label>
+                        <label>تاريخ الاسترداد</label>
                         <input type="date" id="repoDate">
                     </div>
                     <div class="form-group">
-                        <label>موقع الاسترداد | Repo Location</label>
-                        <input type="text" id="repoLocation">
+                        <label>موقع الاسترداد</label>
+                        <input type="text" id="repoLocation" placeholder="أدخل موقع الاسترداد">
+                    </div>
+                    <div class="form-group">
+                        <label>التقييم العام</label>
+                        <select id="overallRating">
+                            <option value="">اختر...</option>
+                            <option value="excellent">ممتاز</option>
+                            <option value="good">جيد</option>
+                            <option value="fair">مقبول</option>
+                            <option value="poor">ضعيف</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>القيمة السوقية (ر.س)</label>
+                        <input type="number" id="marketValue" placeholder="أدخل القيمة التقديرية">
+                    </div>
+                    <div class="form-group">
+                        <label>التوصية</label>
+                        <select id="recommendation">
+                            <option value="">اختر...</option>
+                            <option value="sell_as_is">البيع كما هي</option>
+                            <option value="repair_sell">إصلاح ثم بيع</option>
+                            <option value="auction">البيع بالمزاد</option>
+                            <option value="scrap">التخريد</option>
+                        </select>
                     </div>
                 </div>
 
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>ملاحظات إضافية</label>
+                    <textarea id="notes" placeholder="أدخل أي ملاحظات إضافية..."></textarea>
+                </div>
+
+                <!-- Photos Upload -->
                 <div class="photos-upload-section">
-                    <h3><i class="fas fa-camera"></i> صور المركبة (حتى 3 صور)</h3>
+                    <h3><i class="fas fa-camera"></i> صور المركبة (الحد الأقصى 5MB لكل صورة)</h3>
                     <div class="photos-upload-grid">
                         <div class="photo-upload-box" id="photoBox1">
-                            <input type="file" id="photo1" accept="image/*" onchange="handlePhotoUpload(0, event)">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 1<br><small>اضغط للرفع</small></span>
+                            <input type="file" accept="image/*" onchange="handlePhotoUpload(0, event)">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>الصورة الأولى</span>
                         </div>
                         <div class="photo-upload-box" id="photoBox2">
-                            <input type="file" id="photo2" accept="image/*" onchange="handlePhotoUpload(1, event)">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 2<br><small>اضغط للرفع</small></span>
+                            <input type="file" accept="image/*" onchange="handlePhotoUpload(1, event)">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>الصورة الثانية</span>
                         </div>
                         <div class="photo-upload-box" id="photoBox3">
-                            <input type="file" id="photo3" accept="image/*" onchange="handlePhotoUpload(2, event)">
-                            <i class="fas fa-image"></i>
-                            <span>الصورة 3<br><small>اضغط للرفع</small></span>
+                            <input type="file" accept="image/*" onchange="handlePhotoUpload(2, event)">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>الصورة الثالثة</span>
                         </div>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label>التقييم الإجمالي | Overall Rating</label>
-                    <select id="overallRating">
-                        <option value="">اختر...</option>
-                        <option value="excellent">ممتاز | Excellent</option>
-                        <option value="good">جيد | Good</option>
-                        <option value="fair">مقبول | Fair</option>
-                        <option value="poor">ضعيف | Poor</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>القيمة السوقية | Market Value (ر.س)</label>
-                    <input type="number" id="marketValue" min="0" step="100">
-                </div>
-
-                <div class="form-group">
-                    <label>التوصية | Recommendation</label>
-                    <select id="recommendation">
-                        <option value="">اختر...</option>
-                        <option value="sell_as_is">البيع كما هي | Sell As-Is</option>
-                        <option value="repair_sell">الإصلاح ثم البيع | Repair & Sell</option>
-                        <option value="auction">البيع في المزاد | Auction</option>
-                        <option value="scrap">التخريد | Scrap</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>ملاحظات | Notes</label>
-                    <textarea id="notes" rows="4"></textarea>
                 </div>
 
                 <div class="form-actions-bottom">
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save"></i> <span id="saveButtonText">حفظ المركبة</span>
+                        <i class="fas fa-save"></i>
+                        <span id="saveButtonText">حفظ المركبة</span>
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="hideForm()">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>
             </form>
-        </div>
+        </section>
+    </div>
 
-        <div class="vehicles-section">
-            <h2>
-                <i class="fas fa-list"></i>
-                قائمة المركبات المحفوظة
-            </h2>
-            <div class="vehicles-grid" id="vehiclesGrid">
-                <div class="empty-state">
-                    <i class="fas fa-car-crash"></i>
-                    <h3>لا توجد مركبات محفوظة</h3>
-                    <p>ابدأ بإضافة مركبة جديدة لتظهر هنا</p>
-                    <button class="btn btn-primary" onclick="showForm()">
-                        <i class="fas fa-plus"></i> إضافة مركبة
-                    </button>
-                </div>
+    <!-- View Modal -->
+    <div class="modal-overlay" id="viewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> تفاصيل المركبة</h3>
+                <button onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be loaded dynamically -->
             </div>
         </div>
     </div>
 
-    <script>
-        let vehicles = [];
-        let vehiclePhotos = [null, null, null];
-        let filteredVehicles = [];
-        let activeFilters = {};
+    <!-- Photo Modal -->
+    <div class="photo-modal" id="photoModal" onclick="closePhotoModal()">
+        <button class="close-btn"><i class="fas fa-times"></i></button>
+        <img id="photoModalImg" src="" alt="صورة المركبة">
+    </div>
 
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">جاري المعالجة...</div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <script>
+        // ===== Global Variables =====
+        let vehicles = [];
+        let filteredVehicles = [];
+        let vehiclePhotos = [null, null, null];
+        let autoSaveTimer = null;
+        let periodicAutoSaveTimer = null; // مؤقت الحفظ التلقائي الدوري
+        let isImportedData = false; // علامة للبيانات المستوردة
+        let lastImportTime = null; // وقت آخر استيراد
+        const AUTO_SAVE_INTERVAL = 2000;
+        const PERIODIC_AUTO_SAVE_INTERVAL = 60000; // حفظ كل دقيقة (60 ثانية)
+        const STORAGE_KEY = 'repossessed_vehicles_v2';
+        const IMPORT_FLAG_KEY = 'imported_data_flag';
+
+        // ===== Initialization =====
         document.addEventListener('DOMContentLoaded', function() {
-            loadVehicles();
+            loadFromStorage();
+            initializeDarkMode();
             updateStats();
             populateFilterOptions();
             applyFilters();
-            
-            document.getElementById('vehicleForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveVehicle();
-            });
-
-            document.getElementById('repoDate').value = new Date().toISOString().split('T')[0];
+            setupAutoSave();
+            checkAndRestoreImportedDataState();
         });
 
-        function loadVehicles() {
-            const saved = localStorage.getItem('vehicles');
-            if (saved) {
-                try {
+        // ===== Dark Mode =====
+        function initializeDarkMode() {
+            const isDark = localStorage.getItem('darkMode') === 'true';
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeIcon').className = 'fas fa-sun';
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            document.getElementById('darkModeIcon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            showNotification(isDark ? 'تم تفعيل الوضع الليلي 🌙' : 'تم تفعيل الوضع النهاري ☀️', 'info');
+        }
+
+        // ===== Storage =====
+        function loadFromStorage() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
                     vehicles = JSON.parse(saved);
-                } catch (e) {
-                    console.error('Error loading vehicles:', e);
-                    vehicles = [];
                 }
+            } catch (e) {
+                console.error('Error loading data:', e);
+                vehicles = [];
             }
         }
 
         function saveToStorage() {
-            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(vehicles));
+                updateSaveIndicator('saving');
+                setTimeout(() => updateSaveIndicator('saved'), 500);
+            } catch (e) {
+                console.error('Error saving data:', e);
+                showNotification('خطأ في حفظ البيانات', 'error');
+            }
         }
 
+        function updateSaveIndicator(status) {
+            const indicator = document.getElementById('saveIndicator');
+            if (status === 'saving') {
+                indicator.innerHTML = '<span class="dot" style="background: #f59e0b;"></span><span>جاري الحفظ...</span>';
+            } else {
+                indicator.innerHTML = '<span class="dot"></span><span>محفوظ تلقائياً</span>';
+            }
+        }
+
+        function setupAutoSave() {
+            // Auto-save is triggered on each change
+        }
+
+        // ===== الحفظ التلقائي الدوري للبيانات المستوردة =====
+        function checkAndRestoreImportedDataState() {
+            // استعادة حالة البيانات المستوردة إذا كانت موجودة
+            try {
+                const importFlag = localStorage.getItem(IMPORT_FLAG_KEY);
+                if (importFlag) {
+                    const flagData = JSON.parse(importFlag);
+                    if (flagData && flagData.isImported) {
+                        isImportedData = true;
+                        lastImportTime = new Date(flagData.importTime);
+                        startPeriodicAutoSave();
+                        updateAutoSaveStatusUI(true);
+                        updatePeriodicSaveButton(true);
+                        console.log('تم استعادة حالة الحفظ التلقائي الدوري');
+                    }
+                }
+            } catch (e) {
+                console.error('Error restoring import state:', e);
+            }
+        }
+
+        function startPeriodicAutoSave() {
+            // إيقاف أي مؤقت سابق
+            stopPeriodicAutoSave();
+            
+            // بدء الحفظ التلقائي الدوري كل دقيقة
+            periodicAutoSaveTimer = setInterval(function() {
+                if (isImportedData && vehicles.length > 0) {
+                    performPeriodicAutoSave();
+                }
+            }, PERIODIC_AUTO_SAVE_INTERVAL);
+            
+            console.log('بدأ الحفظ التلقائي الدوري كل دقيقة');
+        }
+
+        function stopPeriodicAutoSave() {
+            if (periodicAutoSaveTimer) {
+                clearInterval(periodicAutoSaveTimer);
+                periodicAutoSaveTimer = null;
+            }
+        }
+
+        function performPeriodicAutoSave() {
+            try {
+                // حفظ البيانات في localStorage
+                saveToStorage();
+                
+                // إنشاء نسخة احتياطية مؤقتة
+                const backupData = {
+                    vehicles: vehicles,
+                    backupTime: new Date().toISOString(),
+                    isPeriodicBackup: true
+                };
+                localStorage.setItem('periodic_backup_' + STORAGE_KEY, JSON.stringify(backupData));
+                
+                // تحديث مؤشر الحفظ
+                updatePeriodicSaveIndicator();
+                
+                console.log('تم الحفظ التلقائي الدوري:', new Date().toLocaleTimeString('ar-SA'));
+            } catch (e) {
+                console.error('خطأ في الحفظ التلقائي الدوري:', e);
+                showNotification('تحذير: فشل الحفظ التلقائي', 'warning');
+            }
+        }
+
+        function updatePeriodicSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            const time = new Date().toLocaleTimeString('ar-SA');
+            indicator.innerHTML = `<span class="dot" style="background: #10b981;"></span><span>حفظ تلقائي (${time})</span>`;
+            
+            // إظهار إشعار صغير
+            const notification = document.createElement('div');
+            notification.className = 'periodic-save-toast';
+            notification.innerHTML = `<i class="fas fa-save"></i> تم الحفظ التلقائي - ${time}`;
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+                z-index: 9999;
+                animation: slideInUp 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutDown 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        }
+
+        function updateAutoSaveStatusUI(isActive) {
+            // تحديث واجهة المستخدم لإظهار حالة الحفظ التلقائي
+            let statusBadge = document.getElementById('autoSaveStatusBadge');
+            
+            if (isActive) {
+                if (!statusBadge) {
+                    statusBadge = document.createElement('div');
+                    statusBadge.id = 'autoSaveStatusBadge';
+                    statusBadge.style.cssText = `
+                        position: fixed;
+                        bottom: 20px;
+                        right: 20px;
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        color: white;
+                        padding: 12px 20px;
+                        border-radius: 12px;
+                        font-size: 13px;
+                        z-index: 9999;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                        cursor: pointer;
+                    `;
+                    statusBadge.innerHTML = `
+                        <i class="fas fa-sync fa-spin" style="margin-left: 5px;"></i>
+                        <div>
+                            <div style="font-weight: 600;">الحفظ التلقائي نشط</div>
+                            <div style="font-size: 11px; opacity: 0.9;">يحفظ كل دقيقة</div>
+                        </div>
+                        <button onclick="togglePeriodicAutoSave(event)" style="
+                            background: rgba(255,255,255,0.2);
+                            border: none;
+                            color: white;
+                            padding: 5px 10px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 12px;
+                            margin-right: 10px;
+                        ">إيقاف</button>
+                    `;
+                    document.body.appendChild(statusBadge);
+                }
+            } else {
+                if (statusBadge) {
+                    statusBadge.remove();
+                }
+            }
+        }
+
+        function togglePeriodicAutoSave(event) {
+            event.stopPropagation();
+            
+            if (periodicAutoSaveTimer) {
+                // إيقاف الحفظ التلقائي
+                stopPeriodicAutoSave();
+                isImportedData = false;
+                localStorage.removeItem(IMPORT_FLAG_KEY);
+                updateAutoSaveStatusUI(false);
+                updatePeriodicSaveButton(false);
+                showNotification('تم إيقاف الحفظ التلقائي الدوري ⏹️', 'info');
+            } else if (vehicles.length > 0) {
+                // إعادة تشغيل الحفظ التلقائي
+                isImportedData = true;
+                lastImportTime = new Date();
+                saveImportFlag();
+                startPeriodicAutoSave();
+                updateAutoSaveStatusUI(true);
+                updatePeriodicSaveButton(true);
+                showNotification('تم تفعيل الحفظ التلقائي الدوري (كل دقيقة) 🔄', 'success');
+            }
+        }
+
+        function saveImportFlag() {
+            const flagData = {
+                isImported: true,
+                importTime: new Date().toISOString()
+            };
+            localStorage.setItem(IMPORT_FLAG_KEY, JSON.stringify(flagData));
+        }
+
+        function manualTogglePeriodicSave() {
+            if (periodicAutoSaveTimer) {
+                // إيقاف الحفظ التلقائي
+                stopPeriodicAutoSave();
+                isImportedData = false;
+                localStorage.removeItem(IMPORT_FLAG_KEY);
+                updateAutoSaveStatusUI(false);
+                updatePeriodicSaveButton(false);
+                showNotification('تم إيقاف الحفظ التلقائي الدوري ⏹️', 'info');
+            } else if (vehicles.length > 0) {
+                // تشغيل الحفظ التلقائي
+                isImportedData = true;
+                lastImportTime = new Date();
+                saveImportFlag();
+                startPeriodicAutoSave();
+                updateAutoSaveStatusUI(true);
+                updatePeriodicSaveButton(true);
+                showNotification('تم تفعيل الحفظ التلقائي الدوري (كل دقيقة) 🔄', 'success');
+            } else {
+                showNotification('لا توجد بيانات للحفظ التلقائي', 'warning');
+            }
+        }
+
+        function updatePeriodicSaveButton(isActive) {
+            const btn = document.getElementById('periodicSaveToggleBtn');
+            if (btn) {
+                if (isActive) {
+                    btn.innerHTML = '<i class="fas fa-stop-circle"></i> إيقاف الحفظ التلقائي';
+                    btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                } else {
+                    btn.innerHTML = '<i class="fas fa-sync"></i> حفظ تلقائي دوري';
+                    btn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                }
+            }
+        }
+
+        // ===== Stats =====
         function updateStats() {
             document.getElementById('totalVehicles').textContent = vehicles.length;
-            
-            const totalValue = vehicles.reduce((sum, v) => {
-                return sum + (parseFloat(v.marketValue) || 0);
-            }, 0);
-            
+            const totalValue = vehicles.reduce((sum, v) => sum + (parseFloat(v.marketValue) || 0), 0);
             document.getElementById('totalValue').textContent = totalValue.toLocaleString('ar-SA');
         }
 
+        // ===== Filter =====
         function populateFilterOptions() {
-            // Get unique values
-            const makes = [...new Set(vehicles.map(v => v.make).filter(Boolean))].sort();
-            const models = [...new Set(vehicles.map(v => v.model).filter(Boolean))].sort();
-            const years = [...new Set(vehicles.map(v => v.year).filter(Boolean))].sort((a, b) => b - a);
-            const colors = [...new Set(vehicles.map(v => v.color).filter(Boolean))].sort();
-
-            // Populate dropdowns
-            const makeFilter = document.getElementById('makeFilter');
-            makeFilter.innerHTML = '<option value="">الكل | All</option>' + 
-                makes.map(m => `<option value="${m}">${m}</option>`).join('');
-
-            const modelFilter = document.getElementById('modelFilter');
-            modelFilter.innerHTML = '<option value="">الكل | All</option>' + 
-                models.map(m => `<option value="${m}">${m}</option>`).join('');
-
-            const yearFilter = document.getElementById('yearFilter');
-            yearFilter.innerHTML = '<option value="">الكل | All</option>' + 
-                years.map(y => `<option value="${y}">${y}</option>`).join('');
-
-            const colorFilter = document.getElementById('colorFilter');
-            colorFilter.innerHTML = '<option value="">الكل | All</option>' + 
-                colors.map(c => `<option value="${c}">${c}</option>`).join('');
-        }
-
-        function toggleFilters() {
-            const filterSection = document.getElementById('filterSection');
-            const toggleText = document.getElementById('filterToggleText');
+            // Get unique values from vehicles
+            const makes = [...new Set(vehicles.map(v => v.make).filter(m => m))].sort();
+            const models = [...new Set(vehicles.map(v => v.model).filter(m => m))].sort();
+            const years = [...new Set(vehicles.map(v => v.year).filter(y => y))].sort((a, b) => b - a);
+            const colors = [...new Set(vehicles.map(v => v.color).filter(c => c))].sort();
             
-            if (filterSection.style.display === 'none') {
-                filterSection.style.display = 'block';
-                toggleText.textContent = 'إخفاء الفلاتر';
-            } else {
-                filterSection.style.display = 'none';
-                toggleText.textContent = 'إظهار الفلاتر';
-            }
+            // Populate Make filter
+            const filterMake = document.getElementById('filterMake');
+            filterMake.innerHTML = '<option value="">الكل</option>';
+            makes.forEach(make => {
+                filterMake.innerHTML += `<option value="${make}">${make}</option>`;
+            });
+            
+            // Populate Model filter
+            const filterModel = document.getElementById('filterModel');
+            filterModel.innerHTML = '<option value="">الكل</option>';
+            models.forEach(model => {
+                filterModel.innerHTML += `<option value="${model}">${model}</option>`;
+            });
+            
+            // Populate Year filter
+            const filterYear = document.getElementById('filterYear');
+            filterYear.innerHTML = '<option value="">الكل</option>';
+            years.forEach(year => {
+                filterYear.innerHTML += `<option value="${year}">${year}</option>`;
+            });
+            
+            // Populate Color filter
+            const filterColor = document.getElementById('filterColor');
+            filterColor.innerHTML = '<option value="">الكل</option>';
+            colors.forEach(color => {
+                filterColor.innerHTML += `<option value="${color}">${color}</option>`;
+            });
         }
 
         function applyFilters() {
-            const searchTerm = document.getElementById('searchFilter').value.toLowerCase();
-            const makeFilter = document.getElementById('makeFilter').value;
-            const modelFilter = document.getElementById('modelFilter').value;
-            const yearFilter = document.getElementById('yearFilter').value;
-            const fuelFilter = document.getElementById('fuelFilter').value;
-            const ratingFilter = document.getElementById('ratingFilter').value;
-            const recommendationFilter = document.getElementById('recommendationFilter').value;
-            const colorFilter = document.getElementById('colorFilter').value;
-            const valueFrom = parseFloat(document.getElementById('valueFromFilter').value) || 0;
-            const valueTo = parseFloat(document.getElementById('valueToFilter').value) || Infinity;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const make = document.getElementById('filterMake').value;
+            const model = document.getElementById('filterModel').value;
+            const year = document.getElementById('filterYear').value;
+            const fuel = document.getElementById('filterFuel').value;
+            const color = document.getElementById('filterColor').value;
+            const rating = document.getElementById('filterRating').value;
+            const recommendation = document.getElementById('filterRecommendation').value;
             const sortBy = document.getElementById('sortBy').value;
 
-            // Filter vehicles
-            filteredVehicles = vehicles.filter(vehicle => {
+            filteredVehicles = vehicles.filter(v => {
                 // Search filter
-                if (searchTerm) {
-                    const searchableText = `${vehicle.contractNo} ${vehicle.customerName} ${vehicle.vin} ${vehicle.make} ${vehicle.model}`.toLowerCase();
-                    if (!searchableText.includes(searchTerm)) return false;
-                }
+                const matchSearch = !search || 
+                    (v.customerName && v.customerName.toLowerCase().includes(search)) ||
+                    (v.vin && v.vin.toLowerCase().includes(search)) ||
+                    (v.contractNo && v.contractNo.toLowerCase().includes(search)) ||
+                    (v.make && v.make.toLowerCase().includes(search)) ||
+                    (v.model && v.model.toLowerCase().includes(search)) ||
+                    (v.plateNo && v.plateNo.toLowerCase().includes(search)) ||
+                    (v.color && v.color.toLowerCase().includes(search));
 
-                // Other filters
-                if (makeFilter && vehicle.make !== makeFilter) return false;
-                if (modelFilter && vehicle.model !== modelFilter) return false;
-                if (yearFilter && vehicle.year !== yearFilter) return false;
-                if (fuelFilter && vehicle.fuelType !== fuelFilter) return false;
-                if (ratingFilter && vehicle.overallRating !== ratingFilter) return false;
-                if (recommendationFilter && vehicle.recommendation !== recommendationFilter) return false;
-                if (colorFilter && vehicle.color !== colorFilter) return false;
+                // Individual filters
+                const matchMake = !make || v.make === make;
+                const matchModel = !model || v.model === model;
+                const matchYear = !year || v.year === year;
+                const matchFuel = !fuel || v.fuelType === fuel;
+                const matchColor = !color || v.color === color;
+                const matchRating = !rating || v.overallRating === rating;
+                const matchRecommendation = !recommendation || v.recommendation === recommendation;
 
-                // Value range filter
-                const value = parseFloat(vehicle.marketValue) || 0;
-                if (value < valueFrom || value > valueTo) return false;
-
-                return true;
+                return matchSearch && matchMake && matchModel && matchYear && matchFuel && matchColor && matchRating && matchRecommendation;
             });
 
-            // Sort vehicles
-            const [sortField, sortOrder] = sortBy.split('-');
+            // Sort
             filteredVehicles.sort((a, b) => {
-                let aVal = a[sortField];
-                let bVal = b[sortField];
-
-                // Handle different data types
-                if (sortField === 'marketValue') {
-                    aVal = parseFloat(aVal) || 0;
-                    bVal = parseFloat(bVal) || 0;
-                } else if (sortField === 'year') {
-                    aVal = parseInt(aVal) || 0;
-                    bVal = parseInt(bVal) || 0;
-                } else if (sortField === 'timestamp') {
-                    aVal = new Date(aVal).getTime();
-                    bVal = new Date(bVal).getTime();
-                } else {
-                    aVal = String(aVal || '').toLowerCase();
-                    bVal = String(bVal || '').toLowerCase();
-                }
-
-                if (sortOrder === 'asc') {
-                    return aVal > bVal ? 1 : -1;
-                } else {
-                    return aVal < bVal ? 1 : -1;
+                switch (sortBy) {
+                    case 'newest':
+                        return new Date(b.timestamp || 0) - new Date(a.timestamp || 0);
+                    case 'oldest':
+                        return new Date(a.timestamp || 0) - new Date(b.timestamp || 0);
+                    case 'value-high':
+                        return (parseFloat(b.marketValue) || 0) - (parseFloat(a.marketValue) || 0);
+                    case 'value-low':
+                        return (parseFloat(a.marketValue) || 0) - (parseFloat(b.marketValue) || 0);
+                    case 'year-high':
+                        return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+                    case 'year-low':
+                        return (parseInt(a.year) || 0) - (parseInt(b.year) || 0);
+                    case 'make-asc':
+                        return (a.make || '').localeCompare(b.make || '', 'ar');
+                    case 'customer-asc':
+                        return (a.customerName || '').localeCompare(b.customerName || '', 'ar');
+                    default:
+                        return 0;
                 }
             });
-
-            // Update active filters display
-            updateActiveFilters();
 
             // Update results count
-            document.getElementById('resultsCount').innerHTML = `
-                <i class="fas fa-car"></i>
-                <span>${filteredVehicles.length} مركبة</span>
-            `;
+            const resultsCount = document.getElementById('resultsCount');
+            if (resultsCount) {
+                resultsCount.innerHTML = `<i class="fas fa-car"></i> <span>${filteredVehicles.length} من ${vehicles.length} مركبة</span>`;
+            }
 
-            // Render filtered vehicles
             renderVehicles();
         }
 
-        function updateActiveFilters() {
-            const activeFiltersDiv = document.getElementById('activeFilters');
-            const filters = [];
-
-            if (document.getElementById('searchFilter').value) {
-                filters.push({ label: 'بحث: ' + document.getElementById('searchFilter').value, id: 'searchFilter' });
-            }
-            if (document.getElementById('makeFilter').value) {
-                filters.push({ label: 'نوع: ' + document.getElementById('makeFilter').value, id: 'makeFilter' });
-            }
-            if (document.getElementById('modelFilter').value) {
-                filters.push({ label: 'موديل: ' + document.getElementById('modelFilter').value, id: 'modelFilter' });
-            }
-            if (document.getElementById('yearFilter').value) {
-                filters.push({ label: 'سنة: ' + document.getElementById('yearFilter').value, id: 'yearFilter' });
-            }
-            if (document.getElementById('fuelFilter').value) {
-                filters.push({ label: 'وقود: ' + getFuelTypeText(document.getElementById('fuelFilter').value), id: 'fuelFilter' });
-            }
-            if (document.getElementById('ratingFilter').value) {
-                filters.push({ label: 'تقييم: ' + getRatingText(document.getElementById('ratingFilter').value), id: 'ratingFilter' });
-            }
-            if (document.getElementById('recommendationFilter').value) {
-                filters.push({ label: 'توصية: ' + getRecommendationText(document.getElementById('recommendationFilter').value), id: 'recommendationFilter' });
-            }
-            if (document.getElementById('colorFilter').value) {
-                filters.push({ label: 'لون: ' + document.getElementById('colorFilter').value, id: 'colorFilter' });
-            }
-            if (document.getElementById('valueFromFilter').value || document.getElementById('valueToFilter').value) {
-                const from = document.getElementById('valueFromFilter').value || '0';
-                const to = document.getElementById('valueToFilter').value || '∞';
-                filters.push({ label: `قيمة: ${from} - ${to}`, id: 'valueRange' });
-            }
-
-            if (filters.length > 0) {
-                activeFiltersDiv.innerHTML = filters.map(f => `
-                    <span class="filter-badge">
-                        ${f.label}
-                        <button onclick="removeFilter('${f.id}')">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </span>
-                `).join('');
-            } else {
-                activeFiltersDiv.innerHTML = '';
-            }
-        }
-
-        function removeFilter(filterId) {
-            if (filterId === 'valueRange') {
-                document.getElementById('valueFromFilter').value = '';
-                document.getElementById('valueToFilter').value = '';
-            } else {
-                document.getElementById(filterId).value = '';
-            }
-            applyFilters();
-        }
-
         function resetFilters() {
-            document.getElementById('searchFilter').value = '';
-            document.getElementById('makeFilter').value = '';
-            document.getElementById('modelFilter').value = '';
-            document.getElementById('yearFilter').value = '';
-            document.getElementById('fuelFilter').value = '';
-            document.getElementById('ratingFilter').value = '';
-            document.getElementById('recommendationFilter').value = '';
-            document.getElementById('colorFilter').value = '';
-            document.getElementById('valueFromFilter').value = '';
-            document.getElementById('valueToFilter').value = '';
-            document.getElementById('sortBy').value = 'timestamp-desc';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterMake').value = '';
+            document.getElementById('filterModel').value = '';
+            document.getElementById('filterYear').value = '';
+            document.getElementById('filterFuel').value = '';
+            document.getElementById('filterColor').value = '';
+            document.getElementById('filterRating').value = '';
+            document.getElementById('filterRecommendation').value = '';
+            document.getElementById('sortBy').value = 'newest';
             applyFilters();
+            showNotification('تم إعادة تعيين الفلاتر', 'info');
         }
 
-        function exportCompleteData() {
-            if (vehicles.length === 0) {
-                showNotification('لا توجد بيانات للتصدير', 'warning');
-                return;
-            }
-
-            showLoading();
-
-            try {
-                const exportData = {
-                    version: '2.0',
-                    exportDate: new Date().toISOString(),
-                    totalVehicles: vehicles.length,
-                    vehicles: vehicles
-                };
-
-                const dataStr = JSON.stringify(exportData, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(dataBlob);
-                
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `Complete_Vehicle_Data_${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-
-                hideLoading();
-                showNotification(`تم تصدير ${vehicles.length} مركبة بالصور بنجاح!`, 'success');
-
-            } catch (error) {
-                console.error('Export Error:', error);
-                hideLoading();
-                showNotification('حدث خطأ أثناء التصدير', 'error');
-            }
-        }
-
-        function importCompleteData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            showLoading();
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importData = JSON.parse(e.target.result);
-                    
-                    if (!importData.vehicles || !Array.isArray(importData.vehicles)) {
-                        throw new Error('Invalid data format');
-                    }
-
-                    // Ask user what to do with existing data
-                    let shouldMerge = false;
-                    if (vehicles.length > 0) {
-                        const choice = confirm(
-                            `يوجد ${vehicles.length} مركبة حالياً.\n\n` +
-                            `اضغط "موافق" للدمج مع البيانات الحالية\n` +
-                            `اضغط "إلغاء" لاستبدال البيانات الحالية\n\n` +
-                            `Current: ${vehicles.length} vehicles\n` +
-                            `"OK" to merge | "Cancel" to replace`
-                        );
-                        shouldMerge = choice;
-                    }
-
-                    if (shouldMerge) {
-                        vehicles = [...vehicles, ...importData.vehicles];
-                    } else {
-                        vehicles = importData.vehicles;
-                    }
-
-                    saveToStorage();
-                    updateStats();
-                    populateFilterOptions();
-                    applyFilters();
-
-                    hideLoading();
-                    showNotification(
-                        `تم استيراد ${importData.vehicles.length} مركبة بنجاح!${shouldMerge ? ' (دمج)' : ' (استبدال)'}`,
-                        'success'
-                    );
-
-                    // Reset file input
-                    event.target.value = '';
-
-                } catch (error) {
-                    console.error('Import Error:', error);
-                    hideLoading();
-                    showNotification('خطأ في قراءة الملف. تأكد من صحة الملف', 'error');
-                    event.target.value = '';
-                }
-            };
-
-            reader.onerror = function() {
-                hideLoading();
-                showNotification('فشل قراءة الملف', 'error');
-                event.target.value = '';
-            };
-
-            reader.readAsText(file);
-        }
-
-        function handlePhotoUpload(index, event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            if (file.size > 5 * 1024 * 1024) {
-                showNotification('حجم الصورة كبير جداً (أقصى حد 5MB)', 'error');
-                event.target.value = '';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                vehiclePhotos[index] = e.target.result;
-                const photoBox = document.getElementById(`photoBox${index + 1}`);
-                photoBox.innerHTML = `
-                    <div class="photo-preview">
-                        <img src="${e.target.result}" alt="صورة ${index + 1}">
-                        <button type="button" class="remove-photo" onclick="removePhoto(${index})">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                `;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function removePhoto(index) {
-            vehiclePhotos[index] = null;
-            const photoBox = document.getElementById(`photoBox${index + 1}`);
-            photoBox.innerHTML = `
-                <input type="file" id="photo${index + 1}" accept="image/*" onchange="handlePhotoUpload(${index}, event)">
-                <i class="fas fa-image"></i>
-                <span>الصورة ${index + 1}<br><small>اضغط للرفع</small></span>
-            `;
-        }
-
+        // ===== Render Vehicles =====
         function renderVehicles() {
             const grid = document.getElementById('vehiclesGrid');
-            const vehiclesToRender = filteredVehicles.length > 0 || Object.keys(activeFilters).length > 0 ? filteredVehicles : vehicles;
-            
+            const vehiclesToRender = filteredVehicles;
+
             if (vehicles.length === 0) {
                 grid.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-car-crash"></i>
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <i class="fas fa-car-side"></i>
                         <h3>لا توجد مركبات محفوظة</h3>
                         <p>ابدأ بإضافة مركبة جديدة أو استيراد بيانات موجودة</p>
                         <button class="btn btn-primary" onclick="showForm()">
@@ -1409,7 +1754,7 @@
 
             if (vehiclesToRender.length === 0) {
                 grid.innerHTML = `
-                    <div class="empty-state">
+                    <div class="empty-state" style="grid-column: 1 / -1;">
                         <i class="fas fa-filter"></i>
                         <h3>لا توجد نتائج</h3>
                         <p>لم يتم العثور على مركبات تطابق معايير البحث</p>
@@ -1421,14 +1766,14 @@
                 return;
             }
 
-            grid.innerHTML = vehiclesToRender.map((vehicle, index) => {
+            grid.innerHTML = vehiclesToRender.map((vehicle) => {
                 const actualIndex = vehicles.indexOf(vehicle);
                 return `
                 <div class="vehicle-card">
                     <div class="card-header">
                         <div>
                             <div class="form-number">${vehicle.contractNo || 'N/A'}</div>
-                            <div class="timestamp">${new Date(vehicle.timestamp).toLocaleString('ar-SA')}</div>
+                            <div class="timestamp">${vehicle.timestamp ? new Date(vehicle.timestamp).toLocaleString('ar-SA') : 'N/A'}</div>
                         </div>
                     </div>
                     
@@ -1447,7 +1792,7 @@
                     
                     <div class="info-row">
                         <span class="label">المركبة:</span>
-                        <span class="value">${vehicle.make || 'N/A'} ${vehicle.model || ''} ${vehicle.year || ''}</span>
+                        <span class="value">${vehicle.make || ''} ${vehicle.model || ''} ${vehicle.year || ''}</span>
                     </div>
                     
                     <div class="info-row">
@@ -1474,7 +1819,7 @@
                             <i class="fas fa-file-pdf"></i> PDF
                         </button>
                         ${vehicle.photos && vehicle.photos.length > 0 ? `
-                            <button class="btn-secondary" onclick="exportVehiclePhotos(${actualIndex})" style="background: #8b5cf6; color: white;">
+                            <button style="background: #8b5cf6; color: white;" onclick="exportVehiclePhotos(${actualIndex})">
                                 <i class="fas fa-images"></i> صور
                             </button>
                         ` : ''}
@@ -1490,17 +1835,21 @@
             }).join('');
         }
 
+        // ===== Form Functions =====
         function showForm() {
             document.getElementById('formSection').classList.add('active');
-            document.getElementById('formTitle').textContent = 'إضافة مركبة جديدة';
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus"></i> إضافة مركبة جديدة';
             document.getElementById('saveButtonText').textContent = 'حفظ المركبة';
             document.getElementById('editIndex').value = '-1';
             document.getElementById('vehicleForm').reset();
+            
+            // Reset photos
             vehiclePhotos = [null, null, null];
-            for (let i = 0; i < 3; i++) {
-                removePhoto(i);
-            }
+            resetPhotoBoxes();
+            
+            // Set default date
             document.getElementById('repoDate').value = new Date().toISOString().split('T')[0];
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1508,26 +1857,57 @@
             document.getElementById('formSection').classList.remove('active');
             document.getElementById('vehicleForm').reset();
             vehiclePhotos = [null, null, null];
+            resetPhotoBoxes();
+        }
+
+        function resetPhotoBoxes() {
+            for (let i = 0; i < 3; i++) {
+                const photoBox = document.getElementById(`photoBox${i + 1}`);
+                photoBox.innerHTML = `
+                    <input type="file" accept="image/*" onchange="handlePhotoUpload(${i}, event)">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>الصورة ${i === 0 ? 'الأولى' : i === 1 ? 'الثانية' : 'الثالثة'}</span>
+                `;
+            }
         }
 
         function saveVehicle() {
+            // Validate required fields
+            const requiredFields = ['contractNo', 'vin', 'customerName', 'make', 'model', 'year'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.classList.add('error');
+                    isValid = false;
+                } else {
+                    field.classList.remove('error');
+                }
+            });
+
+            if (!isValid) {
+                showNotification('يرجى ملء جميع الحقول المطلوبة', 'error');
+                return;
+            }
+
             const vehicle = {
-                contractNo: document.getElementById('contractNo').value,
-                vin: document.getElementById('vin').value,
-                customerName: document.getElementById('customerName').value,
-                make: document.getElementById('make').value,
-                model: document.getElementById('model').value,
-                year: document.getElementById('year').value,
-                plateNo: document.getElementById('plateNo').value,
-                odometer: document.getElementById('odometer').value,
-                color: document.getElementById('color').value,
+                contractNo: document.getElementById('contractNo').value.trim(),
+                vin: document.getElementById('vin').value.trim().toUpperCase(),
+                customerName: document.getElementById('customerName').value.trim(),
+                make: document.getElementById('make').value.trim(),
+                model: document.getElementById('model').value.trim(),
+                year: document.getElementById('year').value.trim(),
+                plateNo: document.getElementById('plateNo').value.trim(),
+                odometer: document.getElementById('odometer').value.trim(),
+                color: document.getElementById('color').value.trim(),
                 fuelType: document.getElementById('fuelType').value,
                 repoDate: document.getElementById('repoDate').value,
-                repoLocation: document.getElementById('repoLocation').value,
+                repoLocation: document.getElementById('repoLocation').value.trim(),
                 overallRating: document.getElementById('overallRating').value,
-                marketValue: document.getElementById('marketValue').value,
+                marketValue: document.getElementById('marketValue').value.trim(),
                 recommendation: document.getElementById('recommendation').value,
-                notes: document.getElementById('notes').value,
+                notes: document.getElementById('notes').value.trim(),
                 photos: vehiclePhotos.filter(p => p),
                 timestamp: new Date().toISOString()
             };
@@ -1535,11 +1915,13 @@
             const editIndex = parseInt(document.getElementById('editIndex').value);
             
             if (editIndex >= 0) {
+                // Keep the original timestamp when editing
+                vehicle.timestamp = vehicles[editIndex].timestamp || vehicle.timestamp;
                 vehicles[editIndex] = vehicle;
-                showNotification('تم تحديث المركبة بنجاح!', 'success');
+                showNotification('تم تحديث المركبة بنجاح! ✅', 'success');
             } else {
                 vehicles.push(vehicle);
-                showNotification('تم حفظ المركبة بنجاح!', 'success');
+                showNotification('تم حفظ المركبة بنجاح! ✅', 'success');
             }
             
             saveToStorage();
@@ -1549,8 +1931,110 @@
             hideForm();
         }
 
+        // ===== FIXED: Edit Vehicle Function =====
+        function editVehicle(index) {
+            const vehicle = vehicles[index];
+            
+            if (!vehicle) {
+                showNotification('خطأ: لم يتم العثور على المركبة', 'error');
+                return;
+            }
+            
+            console.log('Starting edit for vehicle index:', index);
+            console.log('Vehicle data:', vehicle);
+            
+            // Set edit index FIRST before anything else
+            document.getElementById('editIndex').value = index;
+            
+            // Update UI for edit mode
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> تعديل بيانات المركبة';
+            document.getElementById('saveButtonText').textContent = 'تحديث المركبة';
+            
+            // Reset vehiclePhotos array to have exactly 3 slots
+            vehiclePhotos = [null, null, null];
+            
+            // Reset ALL photo boxes to default state first
+            for (let i = 0; i < 3; i++) {
+                const photoBox = document.getElementById(`photoBox${i + 1}`);
+                if (photoBox) {
+                    const labels = ['الأولى', 'الثانية', 'الثالثة'];
+                    photoBox.innerHTML = `
+                        <input type="file" accept="image/*" onchange="handlePhotoUpload(${i}, event)">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>الصورة ${labels[i]}</span>
+                    `;
+                }
+            }
+            
+            // Now fill form fields - use setTimeout to ensure DOM is ready
+            setTimeout(() => {
+                // Fill form fields with vehicle data
+                const fields = {
+                    'contractNo': vehicle.contractNo,
+                    'vin': vehicle.vin,
+                    'customerName': vehicle.customerName,
+                    'make': vehicle.make,
+                    'model': vehicle.model,
+                    'year': vehicle.year,
+                    'plateNo': vehicle.plateNo,
+                    'odometer': vehicle.odometer,
+                    'color': vehicle.color,
+                    'fuelType': vehicle.fuelType,
+                    'repoDate': vehicle.repoDate,
+                    'repoLocation': vehicle.repoLocation,
+                    'overallRating': vehicle.overallRating,
+                    'marketValue': vehicle.marketValue,
+                    'recommendation': vehicle.recommendation,
+                    'notes': vehicle.notes
+                };
+                
+                // Set each field value
+                for (const [fieldId, value] of Object.entries(fields)) {
+                    const element = document.getElementById(fieldId);
+                    if (element) {
+                        element.value = value || '';
+                        console.log(`Set ${fieldId} = "${value || ''}"`);
+                    } else {
+                        console.warn(`Field not found: ${fieldId}`);
+                    }
+                }
+                
+                // Handle photos - copy from vehicle data
+                if (vehicle.photos && Array.isArray(vehicle.photos)) {
+                    vehicle.photos.forEach((photo, i) => {
+                        if (photo && i < 3) {
+                            vehiclePhotos[i] = photo;
+                            const photoBox = document.getElementById(`photoBox${i + 1}`);
+                            if (photoBox) {
+                                photoBox.innerHTML = `
+                                    <div class="photo-preview">
+                                        <img src="${photo}" alt="صورة ${i + 1}">
+                                        <button type="button" class="remove-photo" onclick="removePhoto(${i})">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                `;
+                                console.log(`Loaded photo ${i + 1}`);
+                            }
+                        }
+                    });
+                }
+                
+                console.log('Edit complete. Photos:', vehiclePhotos);
+            }, 50);
+            
+            // Show form and scroll
+            document.getElementById('formSection').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function viewVehicle(index) {
             const vehicle = vehicles[index];
+            if (!vehicle) {
+                showNotification('خطأ: لم يتم العثور على المركبة', 'error');
+                return;
+            }
+            
             const modal = document.getElementById('viewModal');
             const modalBody = document.getElementById('modalBody');
             
@@ -1558,7 +2042,7 @@
                 ${vehicle.photos && vehicle.photos.length > 0 ? `
                     <div class="modal-photos">
                         ${vehicle.photos.map(photo => `
-                            <img src="${photo}" alt="صورة المركبة" onclick="window.open('${photo}', '_blank')">
+                            <img src="${photo}" alt="صورة المركبة" onclick="openPhotoModal('${photo}')">
                         `).join('')}
                     </div>
                 ` : ''}
@@ -1576,16 +2060,8 @@
                     <span class="value">${vehicle.customerName || 'N/A'}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="label">نوع المركبة:</span>
-                    <span class="value">${vehicle.make || 'N/A'}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">الموديل:</span>
-                    <span class="value">${vehicle.model || 'N/A'}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">السنة:</span>
-                    <span class="value">${vehicle.year || 'N/A'}</span>
+                    <span class="label">المركبة:</span>
+                    <span class="value">${vehicle.make || ''} ${vehicle.model || ''} ${vehicle.year || ''}</span>
                 </div>
                 <div class="detail-row">
                     <span class="label">رقم اللوحة:</span>
@@ -1638,48 +2114,6 @@
             document.getElementById('viewModal').classList.remove('active');
         }
 
-        function editVehicle(index) {
-            const vehicle = vehicles[index];
-            
-            document.getElementById('editIndex').value = index;
-            document.getElementById('formTitle').textContent = 'تعديل بيانات المركبة';
-            document.getElementById('saveButtonText').textContent = 'تحديث المركبة';
-            
-            document.getElementById('contractNo').value = vehicle.contractNo || '';
-            document.getElementById('vin').value = vehicle.vin || '';
-            document.getElementById('customerName').value = vehicle.customerName || '';
-            document.getElementById('make').value = vehicle.make || '';
-            document.getElementById('model').value = vehicle.model || '';
-            document.getElementById('year').value = vehicle.year || '';
-            document.getElementById('plateNo').value = vehicle.plateNo || '';
-            document.getElementById('odometer').value = vehicle.odometer || '';
-            document.getElementById('color').value = vehicle.color || '';
-            document.getElementById('fuelType').value = vehicle.fuelType || '';
-            document.getElementById('repoDate').value = vehicle.repoDate || '';
-            document.getElementById('repoLocation').value = vehicle.repoLocation || '';
-            document.getElementById('overallRating').value = vehicle.overallRating || '';
-            document.getElementById('marketValue').value = vehicle.marketValue || '';
-            document.getElementById('recommendation').value = vehicle.recommendation || '';
-            document.getElementById('notes').value = vehicle.notes || '';
-            
-            vehiclePhotos = vehicle.photos || [null, null, null];
-            vehiclePhotos.forEach((photo, i) => {
-                if (photo) {
-                    const photoBox = document.getElementById(`photoBox${i + 1}`);
-                    photoBox.innerHTML = `
-                        <div class="photo-preview">
-                            <img src="${photo}" alt="صورة ${i + 1}">
-                            <button type="button" class="remove-photo" onclick="removePhoto(${i})">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    `;
-                }
-            });
-            
-            showForm();
-        }
-
         function deleteVehicle(index) {
             if (confirm('هل أنت متأكد من حذف هذه المركبة؟')) {
                 vehicles.splice(index, 1);
@@ -1705,8 +2139,413 @@
             }
         }
 
+        // ===== Photo Handling =====
+        function handlePhotoUpload(index, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('حجم الصورة كبير جداً (أقصى حد 5MB)', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                vehiclePhotos[index] = e.target.result;
+                const photoBox = document.getElementById(`photoBox${index + 1}`);
+                photoBox.innerHTML = `
+                    <div class="photo-preview">
+                        <img src="${e.target.result}" alt="صورة ${index + 1}">
+                        <button type="button" class="remove-photo" onclick="removePhoto(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(index) {
+            vehiclePhotos[index] = null;
+            const photoBox = document.getElementById(`photoBox${index + 1}`);
+            const labels = ['الأولى', 'الثانية', 'الثالثة'];
+            photoBox.innerHTML = `
+                <input type="file" accept="image/*" onchange="handlePhotoUpload(${index}, event)">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>الصورة ${labels[index]}</span>
+            `;
+        }
+
+        function openPhotoModal(photoSrc) {
+            document.getElementById('photoModalImg').src = photoSrc;
+            document.getElementById('photoModal').classList.add('active');
+        }
+
+        function closePhotoModal() {
+            document.getElementById('photoModal').classList.remove('active');
+        }
+
+        // ===== Export Functions =====
+        async function exportAllToExcel() {
+            if (vehicles.length === 0) {
+                showNotification('لا توجد مركبات للتصدير', 'warning');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const wb = XLSX.utils.book_new();
+                
+                // Summary Sheet
+                const summaryData = [
+                    ['تقرير المركبات المستردة'],
+                    ['تاريخ التصدير:', new Date().toLocaleString('ar-SA')],
+                    [''],
+                    ['إجمالي المركبات:', vehicles.length],
+                    ['القيمة الإجمالية:', vehicles.reduce((sum, v) => sum + (parseFloat(v.marketValue) || 0), 0).toLocaleString('ar-SA') + ' ر.س'],
+                ];
+                
+                const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+                XLSX.utils.book_append_sheet(wb, wsSummary, 'ملخص');
+                
+                // All Vehicles Sheet
+                const allVehiclesData = [
+                    ['رقم العقد', 'VIN', 'العميل', 'النوع', 'الموديل', 'السنة', 'اللوحة', 'العداد', 'اللون', 'الوقود', 'تاريخ الاسترداد', 'التقييم', 'القيمة', 'عدد الصور']
+                ];
+                
+                vehicles.forEach(v => {
+                    allVehiclesData.push([
+                        v.contractNo || '',
+                        v.vin || '',
+                        v.customerName || '',
+                        v.make || '',
+                        v.model || '',
+                        v.year || '',
+                        v.plateNo || '',
+                        v.odometer || '',
+                        v.color || '',
+                        getFuelTypeText(v.fuelType),
+                        v.repoDate || '',
+                        getRatingText(v.overallRating),
+                        v.marketValue || '',
+                        v.photos ? v.photos.length : 0
+                    ]);
+                });
+                
+                const wsAll = XLSX.utils.aoa_to_sheet(allVehiclesData);
+                XLSX.utils.book_append_sheet(wb, wsAll, 'جميع المركبات');
+                
+                const fileName = `تقرير_المركبات_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                hideLoading();
+                showNotification(`تم تصدير ${vehicles.length} مركبة بنجاح! 📊`, 'success');
+                
+            } catch (error) {
+                console.error('Export Error:', error);
+                hideLoading();
+                showNotification('حدث خطأ أثناء التصدير', 'error');
+            }
+        }
+
+        async function exportCompleteData() {
+            if (vehicles.length === 0) {
+                showNotification('لا توجد مركبات للتصدير', 'warning');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const exportData = {
+                    version: '2.0',
+                    exportDate: new Date().toISOString(),
+                    totalVehicles: vehicles.length,
+                    vehicles: vehicles
+                };
+
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `بيانات_المركبات_كاملة_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                hideLoading();
+                showNotification(`تم تصدير ${vehicles.length} مركبة بالصور بنجاح! 💾`, 'success');
+
+            } catch (error) {
+                console.error('Export Error:', error);
+                hideLoading();
+                showNotification('حدث خطأ أثناء التصدير', 'error');
+            }
+        }
+
+        // ===== Export Photos as HTML =====
+        function exportVehiclePhotos(index) {
+            const vehicle = vehicles[index];
+            if (!vehicle || !vehicle.photos || vehicle.photos.length === 0) {
+                showNotification('لا توجد صور لهذه المركبة', 'warning');
+                return;
+            }
+
+            const htmlContent = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صور المركبة - ${vehicle.contractNo || 'N/A'}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f3f4f6; padding: 20px; direction: rtl; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; text-align: center; }
+        .header h1 { font-size: 1.5rem; margin-bottom: 10px; }
+        .info { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .info-item { padding: 10px; background: #f9fafb; border-radius: 8px; }
+        .info-item .label { font-size: 0.85rem; color: #6b7280; margin-bottom: 5px; }
+        .info-item .value { font-weight: 600; color: #111827; }
+        .photos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .photo-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .photo-card img { width: 100%; height: 250px; object-fit: cover; }
+        .photo-card .caption { padding: 15px; text-align: center; font-size: 0.9rem; color: #6b7280; }
+        .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 0.85rem; }
+        @media print { body { background: white; } .header { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>صور المركبة المستردة</h1>
+            <p>Vehicle Photos Report</p>
+        </div>
+        <div class="info">
+            <div class="info-grid">
+                <div class="info-item"><div class="label">رقم العقد | Contract</div><div class="value">${vehicle.contractNo || 'N/A'}</div></div>
+                <div class="info-item"><div class="label">العميل | Customer</div><div class="value">${vehicle.customerName || 'N/A'}</div></div>
+                <div class="info-item"><div class="label">المركبة | Vehicle</div><div class="value">${vehicle.make || ''} ${vehicle.model || ''} ${vehicle.year || ''}</div></div>
+                <div class="info-item"><div class="label">VIN</div><div class="value">${vehicle.vin || 'N/A'}</div></div>
+                <div class="info-item"><div class="label">اللوحة | Plate</div><div class="value">${vehicle.plateNo || 'N/A'}</div></div>
+                <div class="info-item"><div class="label">اللون | Color</div><div class="value">${vehicle.color || 'N/A'}</div></div>
+            </div>
+        </div>
+        <div class="photos-grid">
+            ${vehicle.photos.map((photo, i) => `
+                <div class="photo-card">
+                    <img src="${photo}" alt="صورة ${i + 1}">
+                    <div class="caption">صورة ${i + 1} | Photo ${i + 1}</div>
+                </div>
+            `).join('')}
+        </div>
+        <div class="footer">
+            <p>تاريخ الإنشاء: ${new Date().toLocaleString('ar-SA')} | Generated: ${new Date().toLocaleString()}</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Vehicle_Photos_${vehicle.contractNo || 'Report'}_${new Date().toISOString().split('T')[0]}.html`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showNotification('تم تصدير صور المركبة! 📸', 'success');
+        }
+
+        function exportAllPhotosHTML() {
+            const vehiclesWithPhotos = vehicles.filter(v => v.photos && v.photos.length > 0);
+            
+            if (vehiclesWithPhotos.length === 0) {
+                showNotification('لا توجد مركبات تحتوي على صور', 'warning');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const htmlContent = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جميع صور المركبات المستردة</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f3f4f6; padding: 20px; direction: rtl; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; text-align: center; }
+        .header h1 { font-size: 2rem; margin-bottom: 10px; }
+        .header .stats { font-size: 1.1rem; opacity: 0.9; }
+        .vehicle-section { background: white; border-radius: 15px; padding: 25px; margin-bottom: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .vehicle-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e5e7eb; flex-wrap: wrap; gap: 15px; }
+        .vehicle-title { font-size: 1.3rem; color: #667eea; font-weight: 700; }
+        .vehicle-info { display: flex; gap: 20px; flex-wrap: wrap; }
+        .vehicle-info span { background: #f3f4f6; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; }
+        .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .photo-card { border-radius: 10px; overflow: hidden; border: 2px solid #e5e7eb; transition: all 0.3s; }
+        .photo-card:hover { border-color: #667eea; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .photo-card img { width: 100%; height: 200px; object-fit: cover; }
+        .photo-card .caption { padding: 10px; text-align: center; font-size: 0.85rem; color: #6b7280; background: #f9fafb; }
+        .footer { text-align: center; margin-top: 40px; color: #6b7280; padding: 20px; }
+        .no-break { page-break-inside: avoid; }
+        @media print { 
+            body { background: white; } 
+            .header { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .vehicle-section { box-shadow: none; border: 1px solid #e5e7eb; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📸 تقرير صور المركبات المستردة</h1>
+            <p>All Vehicles Photos Report</p>
+            <div class="stats">${vehiclesWithPhotos.length} مركبة تحتوي على صور | ${vehiclesWithPhotos.reduce((sum, v) => sum + v.photos.length, 0)} صورة إجمالية</div>
+        </div>
+        
+        ${vehiclesWithPhotos.map((vehicle, idx) => `
+            <div class="vehicle-section no-break">
+                <div class="vehicle-header">
+                    <div class="vehicle-title">${idx + 1}. ${vehicle.make || ''} ${vehicle.model || ''} ${vehicle.year || ''}</div>
+                    <div class="vehicle-info">
+                        <span><strong>العقد:</strong> ${vehicle.contractNo || 'N/A'}</span>
+                        <span><strong>العميل:</strong> ${vehicle.customerName || 'N/A'}</span>
+                        <span><strong>VIN:</strong> ${vehicle.vin || 'N/A'}</span>
+                        <span><strong>اللوحة:</strong> ${vehicle.plateNo || 'N/A'}</span>
+                    </div>
+                </div>
+                <div class="photos-grid">
+                    ${vehicle.photos.map((photo, i) => `
+                        <div class="photo-card">
+                            <img src="${photo}" alt="صورة ${i + 1}">
+                            <div class="caption">صورة ${i + 1} | Photo ${i + 1}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('')}
+        
+        <div class="footer">
+            <p><strong>تاريخ الإنشاء:</strong> ${new Date().toLocaleString('ar-SA')}</p>
+            <p>Generated: ${new Date().toLocaleString()}</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `All_Vehicle_Photos_${new Date().toISOString().split('T')[0]}.html`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                hideLoading();
+                showNotification(`تم تصدير صور ${vehiclesWithPhotos.length} مركبة بنجاح! 📸`, 'success');
+
+            } catch (error) {
+                console.error('Export Photos Error:', error);
+                hideLoading();
+                showNotification('حدث خطأ أثناء تصدير الصور', 'error');
+            }
+        }
+
+        function importCompleteData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showLoading();
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importData = JSON.parse(e.target.result);
+                    
+                    if (!importData.vehicles || !Array.isArray(importData.vehicles)) {
+                        throw new Error('Invalid data format');
+                    }
+
+                    // Ask user what to do with existing data
+                    let shouldMerge = false;
+                    if (vehicles.length > 0) {
+                        const choice = confirm(
+                            `يوجد ${vehicles.length} مركبة حالياً.\n\n` +
+                            `اضغط "موافق" للدمج مع البيانات الحالية\n` +
+                            `اضغط "إلغاء" لاستبدال البيانات الحالية`
+                        );
+                        shouldMerge = choice;
+                    }
+
+                    if (shouldMerge) {
+                        vehicles = [...vehicles, ...importData.vehicles];
+                    } else {
+                        vehicles = importData.vehicles;
+                    }
+
+                    saveToStorage();
+                    updateStats();
+                    populateFilterOptions();
+                    applyFilters();
+
+                    // === تفعيل الحفظ التلقائي الدوري للبيانات المستوردة ===
+                    isImportedData = true;
+                    lastImportTime = new Date();
+                    saveImportFlag();
+                    startPeriodicAutoSave();
+                    updateAutoSaveStatusUI(true);
+                    // =================================================
+
+                    hideLoading();
+                    showNotification(
+                        `تم استيراد ${importData.vehicles.length} مركبة بنجاح! ✅${shouldMerge ? ' (دمج)' : ' (استبدال)'}\n🔄 تم تفعيل الحفظ التلقائي كل دقيقة`,
+                        'success'
+                    );
+
+                    // Reset file input
+                    event.target.value = '';
+
+                } catch (error) {
+                    console.error('Import Error:', error);
+                    hideLoading();
+                    showNotification('خطأ في قراءة الملف. تأكد من صحة الملف', 'error');
+                    event.target.value = '';
+                }
+            };
+
+            reader.onerror = function() {
+                hideLoading();
+                showNotification('فشل قراءة الملف', 'error');
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
+        }
+
         async function exportVehicleToPDF(index) {
             const vehicle = vehicles[index];
+            if (!vehicle) {
+                showNotification('خطأ: لم يتم العثور على المركبة', 'error');
+                return;
+            }
+            
             showLoading();
             
             try {
@@ -1729,8 +2568,9 @@
                 y = 35;
                 pdf.setTextColor(0, 0, 0);
 
-                // Helper function
+                // Helper functions
                 const addRow = (label, value) => {
+                    if (y > 270) { pdf.addPage(); y = margin; }
                     pdf.setFontSize(10);
                     pdf.setFont('helvetica', 'bold');
                     pdf.text(label + ':', margin, y);
@@ -1740,6 +2580,7 @@
                 };
 
                 const addSection = (title) => {
+                    if (y > 260) { pdf.addPage(); y = margin; }
                     y += 5;
                     pdf.setFillColor(102, 126, 234);
                     pdf.rect(margin, y - 5, pageWidth - 2 * margin, 8, 'F');
@@ -1769,7 +2610,7 @@
                 // Evaluation
                 addSection('EVALUATION');
                 addRow('Overall Rating', getRatingText(vehicle.overallRating));
-                addRow('Market Value (SAR)', vehicle.marketValue);
+                addRow('Market Value (SAR)', vehicle.marketValue ? parseFloat(vehicle.marketValue).toLocaleString() : 'N/A');
                 addRow('Recommendation', getRecommendationText(vehicle.recommendation));
                 if (vehicle.notes) {
                     addRow('Notes', vehicle.notes);
@@ -1792,6 +2633,12 @@
                             photoX = margin;
                         }
                         
+                        if (y + photoHeight > 280) {
+                            pdf.addPage();
+                            y = margin;
+                            photoX = margin;
+                        }
+                        
                         try {
                             pdf.addImage(photo, 'JPEG', photoX, y, photoWidth, photoHeight);
                             photoX += photoWidth + margin;
@@ -1809,14 +2656,13 @@
                     pdf.setFontSize(8);
                     pdf.setTextColor(128, 128, 128);
                     pdf.text(`Page ${i} of ${totalPages}`, pageWidth / 2, 290, { align: 'center' });
-                    pdf.text(`Generated: ${new Date().toLocaleString()}`, pageWidth - margin, 290, { align: 'right' });
                 }
 
                 const fileName = `Vehicle_${vehicle.contractNo || 'Report'}_${new Date().toISOString().split('T')[0]}.pdf`;
                 pdf.save(fileName);
                 
                 hideLoading();
-                showNotification('تم تصدير PDF بنجاح!', 'success');
+                showNotification('تم تصدير PDF بنجاح! 📄', 'success');
             } catch (error) {
                 console.error('PDF Export Error:', error);
                 hideLoading();
@@ -1824,562 +2670,79 @@
             }
         }
 
-        async function exportAllToExcel() {
-            if (vehicles.length === 0) {
-                showNotification('لا توجد مركبات للتصدير', 'warning');
-                return;
-            }
-            
-            showLoading();
-            
-            try {
-                const wb = XLSX.utils.book_new();
-                
-                // Summary Sheet
-                const summaryData = [
-                    ['REPOSSESSED VEHICLES EVALUATION REPORT'],
-                    ['Generated:', new Date().toLocaleString()],
-                    [''],
-                    ['Total Vehicles:', vehicles.length],
-                    ['Total Value (SAR):', vehicles.reduce((sum, v) => sum + (parseFloat(v.marketValue) || 0), 0).toLocaleString('ar-SA')],
-                    [''],
-                    ['=== STATISTICS ==='],
-                    ['Excellent Rated:', vehicles.filter(v => v.overallRating === 'excellent').length],
-                    ['Good Rated:', vehicles.filter(v => v.overallRating === 'good').length],
-                    ['Fair Rated:', vehicles.filter(v => v.overallRating === 'fair').length],
-                    ['Poor Rated:', vehicles.filter(v => v.overallRating === 'poor').length],
-                    [''],
-                    ['Total Photos:', vehicles.reduce((sum, v) => sum + (v.photos ? v.photos.length : 0), 0)],
-                    [''],
-                    ['NOTE: Vehicle photos are saved separately in HTML files for each vehicle']
-                ];
-                
-                const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-                wsSummary['!cols'] = [{ wch: 30 }, { wch: 40 }];
-                XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
-                
-                // All Vehicles Sheet
-                const allVehiclesData = [
-                    ['Contract No', 'VIN', 'Customer', 'Make', 'Model', 'Year', 'Plate', 'Odometer', 'Color', 
-                     'Fuel Type', 'Repo Date', 'Rating', 'Value (SAR)', 'Photos Count']
-                ];
-                
-                vehicles.forEach(v => {
-                    allVehiclesData.push([
-                        v.contractNo || '',
-                        v.vin || '',
-                        v.customerName || '',
-                        v.make || '',
-                        v.model || '',
-                        v.year || '',
-                        v.plateNo || '',
-                        v.odometer || '',
-                        v.color || '',
-                        getFuelTypeText(v.fuelType),
-                        v.repoDate || '',
-                        getRatingText(v.overallRating),
-                        v.marketValue || '',
-                        v.photos ? v.photos.length : 0
-                    ]);
-                });
-                
-                const wsAll = XLSX.utils.aoa_to_sheet(allVehiclesData);
-                wsAll['!cols'] = Array(14).fill({ wch: 15 });
-                XLSX.utils.book_append_sheet(wb, wsAll, 'All Vehicles');
-                
-                // Individual sheets WITHOUT large base64 strings
-                vehicles.forEach((vehicle, index) => {
-                    const detailData = [
-                        [`VEHICLE #${index + 1} - DETAILED REPORT`],
-                        [''],
-                        ['=== BASIC INFORMATION ==='],
-                        ['Contract Number:', vehicle.contractNo || 'N/A'],
-                        ['VIN:', vehicle.vin || 'N/A'],
-                        ['Customer Name:', vehicle.customerName || 'N/A'],
-                        ['Make:', vehicle.make || 'N/A'],
-                        ['Model:', vehicle.model || 'N/A'],
-                        ['Year:', vehicle.year || 'N/A'],
-                        ['Plate Number:', vehicle.plateNo || 'N/A'],
-                        ['Odometer (km):', vehicle.odometer || 'N/A'],
-                        ['Color:', vehicle.color || 'N/A'],
-                        ['Fuel Type:', getFuelTypeText(vehicle.fuelType)],
-                        ['Repo Date:', vehicle.repoDate || 'N/A'],
-                        ['Repo Location:', vehicle.repoLocation || 'N/A'],
-                        [''],
-                        ['=== EVALUATION ==='],
-                        ['Overall Rating:', getRatingText(vehicle.overallRating)],
-                        ['Market Value (SAR):', vehicle.marketValue || 'N/A'],
-                        ['Recommendation:', getRecommendationText(vehicle.recommendation)],
-                        [''],
-                        ['=== NOTES ==='],
-                        [vehicle.notes || 'No notes'],
-                        [''],
-                        ['=== PHOTOS ==='],
-                        [`Number of Photos: ${vehicle.photos ? vehicle.photos.length : 0}`],
-                        ['Note:', `To view photos, export this vehicle's PDF or use the 'Export Photos' button`]
-                    ];
-                    
-                    const wsDetail = XLSX.utils.aoa_to_sheet(detailData);
-                    wsDetail['!cols'] = [{ wch: 25 }, { wch: 60 }];
-                    
-                    const sheetName = `Vehicle ${index + 1}`.substring(0, 31);
-                    XLSX.utils.book_append_sheet(wb, wsDetail, sheetName);
-                });
-                
-                const fileName = `All_Vehicles_${new Date().toISOString().split('T')[0]}.xlsx`;
-                XLSX.writeFile(wb, fileName);
-                
-                hideLoading();
-                showNotification(`تم تصدير ${vehicles.length} مركبة بنجاح! لعرض الصور، استخدم زر PDF أو 'تصدير الصور'`, 'success');
-                
-            } catch (error) {
-                console.error('Export Error:', error);
-                hideLoading();
-                showNotification('حدث خطأ أثناء التصدير', 'error');
-            }
-        }
-
-        async function exportVehiclePhotos(index) {
-            const vehicle = vehicles[index];
-            
-            if (!vehicle.photos || vehicle.photos.length === 0) {
-                showNotification('لا توجد صور لهذه المركبة', 'warning');
-                return;
-            }
-
-            showLoading();
-
-            try {
-                // Create HTML file with photos
-                const htmlContent = `
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صور المركبة - ${vehicle.contractNo || 'N/A'}</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        .info {
-            background: #f9fafb;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .info-row:last-child { border-bottom: none; }
-        .label { font-weight: 600; color: #6b7280; }
-        .value { color: #111827; }
-        .photos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .photo-box {
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-        }
-        .photo-box h3 {
-            margin-bottom: 10px;
-            color: #374151;
-        }
-        .photo-box img {
-            width: 100%;
-            height: auto;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .photo-box img:hover {
-            opacity: 0.9;
-            transform: scale(1.02);
-            transition: all 0.3s ease;
-        }
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #e5e7eb;
-            text-align: center;
-            color: #6b7280;
-            font-size: 0.9rem;
-        }
-        @media print {
-            body { background: white; }
-            .photo-box { page-break-inside: avoid; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🚗 صور المركبة - Vehicle Photos</h1>
-        
-        <div class="info">
-            <div class="info-row">
-                <span class="label">رقم العقد | Contract No:</span>
-                <span class="value">${vehicle.contractNo || 'N/A'}</span>
-            </div>
-            <div class="info-row">
-                <span class="label">العميل | Customer:</span>
-                <span class="value">${vehicle.customerName || 'N/A'}</span>
-            </div>
-            <div class="info-row">
-                <span class="label">المركبة | Vehicle:</span>
-                <span class="value">${vehicle.make || 'N/A'} ${vehicle.model || ''} ${vehicle.year || ''}</span>
-            </div>
-            <div class="info-row">
-                <span class="label">VIN:</span>
-                <span class="value">${vehicle.vin || 'N/A'}</span>
-            </div>
-            <div class="info-row">
-                <span class="label">عدد الصور | Photos:</span>
-                <span class="value">${vehicle.photos.length}</span>
-            </div>
-        </div>
-
-        <div class="photos-grid">
-            ${vehicle.photos.map((photo, i) => `
-                <div class="photo-box">
-                    <h3>صورة ${i + 1} | Photo ${i + 1}</h3>
-                    <img src="${photo}" alt="صورة ${i + 1}" onclick="window.open(this.src, '_blank')">
-                </div>
-            `).join('')}
-        </div>
-
-        <div class="footer">
-            <p>تم الإنشاء في: ${new Date().toLocaleString('ar-SA')} | Generated: ${new Date().toLocaleString()}</p>
-            <p>نظام تقييم المركبات المستردة | Repossessed Vehicle Evaluation System</p>
-        </div>
-    </div>
-</body>
-</html>`;
-
-                // Download HTML file
-                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `Photos_${vehicle.contractNo || 'Vehicle'}_${new Date().toISOString().split('T')[0]}.html`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-
-                hideLoading();
-                showNotification('تم تصدير الصور بنجاح! افتح ملف HTML لعرضها', 'success');
-
-            } catch (error) {
-                console.error('Export Photos Error:', error);
-                hideLoading();
-                showNotification('حدث خطأ أثناء تصدير الصور', 'error');
-            }
-        }
-
-        async function exportAllPhotosHTML() {
-            const vehiclesWithPhotos = vehicles.filter(v => v.photos && v.photos.length > 0);
-            
-            if (vehiclesWithPhotos.length === 0) {
-                showNotification('لا توجد صور للتصدير', 'warning');
-                return;
-            }
-
-            showLoading();
-
-            try {
-                const htmlContent = `
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جميع صور المركبات - All Vehicle Photos</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #667eea;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .vehicle-section {
-            margin-bottom: 50px;
-            padding: 25px;
-            background: #f9fafb;
-            border-radius: 10px;
-            border: 2px solid #e5e7eb;
-        }
-        .vehicle-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .vehicle-header h2 {
-            margin-bottom: 5px;
-        }
-        .vehicle-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 12px;
-            background: white;
-            border-radius: 6px;
-        }
-        .label { font-weight: 600; color: #6b7280; }
-        .value { color: #111827; }
-        .photos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-        }
-        .photo-box {
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 10px;
-            background: white;
-            text-align: center;
-        }
-        .photo-box h4 {
-            margin-bottom: 8px;
-            color: #374151;
-            font-size: 0.9rem;
-        }
-        .photo-box img {
-            width: 100%;
-            height: auto;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .photo-box img:hover {
-            opacity: 0.9;
-            transform: scale(1.02);
-            transition: all 0.3s ease;
-        }
-        .summary {
-            background: #667eea;
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .summary h3 {
-            margin-bottom: 15px;
-        }
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-        .stat {
-            text-align: center;
-        }
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            display: block;
-        }
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #e5e7eb;
-            text-align: center;
-            color: #6b7280;
-        }
-        @media print {
-            body { background: white; }
-            .vehicle-section { page-break-inside: avoid; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>📸 جميع صور المركبات المستردة | All Repossessed Vehicle Photos</h1>
-        
-        <div class="summary">
-            <h3>ملخص | Summary</h3>
-            <div class="stats">
-                <div class="stat">
-                    <span class="stat-number">${vehiclesWithPhotos.length}</span>
-                    <span class="stat-label">مركبات | Vehicles</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-number">${vehiclesWithPhotos.reduce((sum, v) => sum + v.photos.length, 0)}</span>
-                    <span class="stat-label">صور | Photos</span>
-                </div>
-            </div>
-        </div>
-
-        ${vehiclesWithPhotos.map((vehicle, index) => `
-            <div class="vehicle-section">
-                <div class="vehicle-header">
-                    <h2>🚗 مركبة #${index + 1} | Vehicle #${index + 1}</h2>
-                    <p>${vehicle.contractNo || 'N/A'} - ${vehicle.make || ''} ${vehicle.model || ''} ${vehicle.year || ''}</p>
-                </div>
-                
-                <div class="vehicle-info">
-                    <div class="info-item">
-                        <span class="label">العميل | Customer:</span>
-                        <span class="value">${vehicle.customerName || 'N/A'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">VIN:</span>
-                        <span class="value">${vehicle.vin || 'N/A'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">اللوحة | Plate:</span>
-                        <span class="value">${vehicle.plateNo || 'N/A'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">عدد الصور | Photos:</span>
-                        <span class="value">${vehicle.photos.length}</span>
-                    </div>
-                </div>
-
-                <div class="photos-grid">
-                    ${vehicle.photos.map((photo, i) => `
-                        <div class="photo-box">
-                            <h4>صورة ${i + 1} | Photo ${i + 1}</h4>
-                            <img src="${photo}" alt="صورة ${i + 1}" onclick="window.open(this.src, '_blank')">
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `).join('')}
-
-        <div class="footer">
-            <p>تم الإنشاء في: ${new Date().toLocaleString('ar-SA')} | Generated: ${new Date().toLocaleString()}</p>
-            <p><strong>نظام تقييم المركبات المستردة | Repossessed Vehicle Evaluation System</strong></p>
-            <p style="margin-top: 10px; font-size: 0.85rem;">
-                💡 نصيحة: يمكنك طباعة هذه الصفحة أو حفظها كـ PDF من متصفحك (Ctrl+P أو Cmd+P)
-            </p>
-        </div>
-    </div>
-</body>
-</html>`;
-
-                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `All_Vehicle_Photos_${new Date().toISOString().split('T')[0]}.html`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-
-                hideLoading();
-                showNotification(`تم تصدير صور ${vehiclesWithPhotos.length} مركبة بنجاح!`, 'success');
-
-            } catch (error) {
-                console.error('Export All Photos Error:', error);
-                hideLoading();
-                showNotification('حدث خطأ أثناء تصدير الصور', 'error');
-            }
-        }
-
-        function getRatingText(value) {
+        // ===== Helper Functions =====
+        function getRatingText(rating) {
             const ratings = {
-                'excellent': 'ممتاز | Excellent',
-                'good': 'جيد | Good',
-                'fair': 'مقبول | Fair',
-                'poor': 'ضعيف | Poor'
+                'excellent': 'ممتاز',
+                'good': 'جيد',
+                'fair': 'مقبول',
+                'poor': 'ضعيف'
             };
-            return ratings[value] || 'N/A';
+            return ratings[rating] || rating || 'N/A';
         }
 
-        function getRecommendationText(value) {
+        function getRecommendationText(rec) {
             const recommendations = {
-                'sell_as_is': 'البيع كما هي | Sell As-Is',
-                'repair_sell': 'الإصلاح ثم البيع | Repair & Sell',
-                'auction': 'البيع في المزاد | Auction',
-                'scrap': 'التخريد | Scrap'
+                'sell_as_is': 'البيع كما هي',
+                'repair_sell': 'إصلاح ثم بيع',
+                'auction': 'البيع بالمزاد',
+                'scrap': 'التخريد'
             };
-            return recommendations[value] || 'N/A';
+            return recommendations[rec] || rec || 'N/A';
         }
 
-        function getFuelTypeText(value) {
-            const fuelTypes = {
-                'petrol': 'بنزين | Petrol',
-                'diesel': 'ديزل | Diesel',
-                'hybrid': 'هجين | Hybrid',
-                'electric': 'كهربائي | Electric'
+        function getFuelTypeText(fuel) {
+            const fuels = {
+                'petrol': 'بنزين',
+                'diesel': 'ديزل',
+                'hybrid': 'هجين',
+                'electric': 'كهربائي'
             };
-            return fuelTypes[value] || 'N/A';
-        }
-
-        function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            const text = document.getElementById('notificationText');
-            
-            text.textContent = message;
-            notification.className = `notification ${type} show`;
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 4000);
+            return fuels[fuel] || fuel || 'N/A';
         }
 
         function showLoading() {
-            document.getElementById('loading').classList.add('active');
+            document.getElementById('loadingOverlay').classList.add('active');
         }
 
         function hideLoading() {
-            document.getElementById('loading').classList.remove('active');
+            document.getElementById('loadingOverlay').classList.remove('active');
         }
 
-        function openPhotoModal(photoUrl) {
-            window.open(photoUrl, '_blank');
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            
+            // Remove existing notifications
+            container.innerHTML = '';
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${icons[type]}"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(-50%) translateY(-20px)';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
         }
 
-        document.getElementById('viewModal').addEventListener('click', function(e) {
-            if (e.target === this) {
+        // Close modals on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
                 closeModal();
+                closePhotoModal();
             }
         });
     </script>
