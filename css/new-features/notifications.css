@@ -1,0 +1,285 @@
+/**
+ * ========================================
+ * 🔔 Enhanced Notifications - إشعارات محسنة
+ * ========================================
+ * 
+ * نظام إشعارات متقدم مع أنماط جميلة
+ * 
+ * ⚠️ لا يعدل أي CSS موجود - إضافة فقط!
+ */
+
+/* ===== Notification Container ===== */
+.nf-notification-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 420px;
+    width: calc(100vw - 40px);
+}
+
+/* RTL Support */
+[dir="rtl"] .nf-notification-container {
+    left: auto;
+    right: 20px;
+}
+
+/* ===== Individual Notification ===== */
+.nf-notification {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    animation: nf-slideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.nf-notification:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+}
+
+[dir="rtl"] .nf-notification:hover {
+    transform: translateX(5px);
+}
+
+/* ===== Notification Types ===== */
+
+/* Success */
+.nf-notification.nf-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+/* Error */
+.nf-notification.nf-error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+/* Warning */
+.nf-notification.nf-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+/* Info */
+.nf-notification.nf-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+/* ===== Notification Icon ===== */
+.nf-notification-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+    font-size: 1.2rem;
+}
+
+/* ===== Notification Content ===== */
+.nf-notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.nf-notification-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.nf-notification-message {
+    font-size: 0.9rem;
+    opacity: 0.95;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+/* ===== Close Button ===== */
+.nf-notification-close {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+[dir="rtl"] .nf-notification-close {
+    left: auto;
+    right: 10px;
+}
+
+.nf-notification:hover .nf-notification-close {
+    opacity: 1;
+}
+
+.nf-notification-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* ===== Progress Bar ===== */
+.nf-notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+}
+
+.nf-notification-progress-bar {
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    transition: width linear;
+}
+
+/* ===== Animations ===== */
+@keyframes nf-slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+[dir="rtl"] .nf-notification {
+    animation-name: nf-slideInRTL;
+}
+
+@keyframes nf-slideInRTL {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.nf-notification.nf-removing {
+    animation: nf-slideOut 0.3s ease forwards;
+}
+
+@keyframes nf-slideOut {
+    to {
+        opacity: 0;
+        transform: translateX(-50px) scale(0.95);
+    }
+}
+
+[dir="rtl"] .nf-notification.nf-removing {
+    animation-name: nf-slideOutRTL;
+}
+
+@keyframes nf-slideOutRTL {
+    to {
+        opacity: 0;
+        transform: translateX(50px) scale(0.95);
+    }
+}
+
+/* ===== Shake Animation for Errors ===== */
+.nf-notification.nf-error {
+    animation: nf-slideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+               nf-shake 0.5s ease-in-out 0.4s;
+}
+
+@keyframes nf-shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* ===== Stacking Effect ===== */
+.nf-notification-container .nf-notification:nth-child(2) {
+    transform: scale(0.97);
+    opacity: 0.9;
+}
+
+.nf-notification-container .nf-notification:nth-child(3) {
+    transform: scale(0.94);
+    opacity: 0.8;
+}
+
+.nf-notification-container .nf-notification:nth-child(n+4) {
+    transform: scale(0.91);
+    opacity: 0.7;
+}
+
+/* ===== Dark Mode Support ===== */
+html.dark .nf-notification {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+    .nf-notification-container {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-width: none;
+    }
+    
+    [dir="rtl"] .nf-notification-container {
+        left: 10px;
+    }
+    
+    .nf-notification {
+        padding: 14px 16px;
+    }
+    
+    .nf-notification-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+    
+    .nf-notification-title {
+        font-size: 0.95rem;
+    }
+    
+    .nf-notification-message {
+        font-size: 0.85rem;
+    }
+}
+
+/* ===== Print - Hide ===== */
+@media print {
+    .nf-notification-container {
+        display: none !important;
+    }
+}

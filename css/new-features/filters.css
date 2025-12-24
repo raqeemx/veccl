@@ -1,0 +1,622 @@
+/**
+ * ========================================
+ * 🔍 Advanced Filters - البحث والفلترة
+ * ========================================
+ * 
+ * أنماط البحث والفلترة المتقدمة - النسخة 2.0
+ * 
+ * ⚠️ لا يعدل أي CSS موجود - إضافة فقط!
+ */
+
+/* ===== Filters Container ===== */
+.nf-filters-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+html.dark .nf-filters-section {
+    background: #1e293b;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== Search Box ===== */
+.nf-search-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.nf-search-input {
+    width: 100%;
+    padding: 16px 20px 16px 50px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 1rem;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+[dir="rtl"] .nf-search-input {
+    padding: 16px 50px 16px 45px;
+}
+
+.nf-search-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.nf-search-input::placeholder {
+    color: #94a3b8;
+}
+
+.nf-search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+[dir="rtl"] .nf-search-icon {
+    left: auto;
+    right: 18px;
+}
+
+.nf-search-clear {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #e5e7eb;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+}
+
+[dir="rtl"] .nf-search-clear {
+    right: auto;
+    left: 15px;
+}
+
+.nf-search-clear:hover {
+    background: #ef4444;
+    color: white;
+}
+
+html.dark .nf-search-input {
+    background: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+
+html.dark .nf-search-input:focus {
+    background: #334155;
+    border-color: #818cf8;
+}
+
+html.dark .nf-search-input::placeholder {
+    color: #64748b;
+}
+
+html.dark .nf-search-clear {
+    background: #475569;
+    color: #94a3b8;
+}
+
+html.dark .nf-search-clear:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* ===== Filters Grid ===== */
+.nf-filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+/* ===== Filter Select ===== */
+.nf-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.nf-filter-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nf-filter-label i {
+    color: #667eea;
+    font-size: 0.9rem;
+}
+
+html.dark .nf-filter-label {
+    color: #94a3b8;
+}
+
+html.dark .nf-filter-label i {
+    color: #818cf8;
+}
+
+.nf-filter-select {
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: white;
+    color: #1f2937;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: left 12px center;
+    background-repeat: no-repeat;
+    background-size: 20px;
+    padding-left: 40px;
+}
+
+[dir="rtl"] .nf-filter-select {
+    background-position: right 12px center;
+    padding-left: 16px;
+    padding-right: 40px;
+}
+
+.nf-filter-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.nf-filter-select:hover {
+    border-color: #cbd5e1;
+}
+
+html.dark .nf-filter-select {
+    background-color: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+html.dark .nf-filter-select:hover {
+    border-color: #64748b;
+}
+
+html.dark .nf-filter-select:focus {
+    border-color: #818cf8;
+}
+
+/* ===== Filter Actions ===== */
+.nf-filter-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-top: 10px;
+}
+
+.nf-btn-filter {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nf-btn-apply {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.nf-btn-apply:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.nf-btn-reset {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 2px solid #e5e7eb;
+}
+
+.nf-btn-reset:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+html.dark .nf-btn-reset {
+    background: #334155;
+    color: #94a3b8;
+    border-color: #475569;
+}
+
+html.dark .nf-btn-reset:hover {
+    background: #4c1d1d;
+    color: #f87171;
+    border-color: #7f1d1d;
+}
+
+/* ===== Results Counter ===== */
+.nf-results-count {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #64748b;
+    padding: 10px 16px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    margin-right: auto;
+}
+
+[dir="rtl"] .nf-results-count {
+    margin-right: 0;
+    margin-left: auto;
+}
+
+.nf-results-count i {
+    color: #667eea;
+}
+
+.nf-results-count strong {
+    color: #1f2937;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.nf-results-count strong.nf-count-updated {
+    animation: countPulse 0.3s ease;
+}
+
+@keyframes countPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); color: #667eea; }
+}
+
+html.dark .nf-results-count {
+    background: #334155;
+    color: #94a3b8;
+}
+
+html.dark .nf-results-count i {
+    color: #818cf8;
+}
+
+html.dark .nf-results-count strong {
+    color: #f1f5f9;
+}
+
+/* ===== Active Filters Tags ===== */
+.nf-active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+html.dark .nf-active-filters {
+    border-top-color: #475569;
+}
+
+.nf-active-filters-label {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nf-active-filters-label i {
+    color: #667eea;
+}
+
+html.dark .nf-active-filters-label {
+    color: #94a3b8;
+}
+
+html.dark .nf-active-filters-label i {
+    color: #818cf8;
+}
+
+.nf-filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    color: #1e40af;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid #bfdbfe;
+    transition: all 0.2s ease;
+}
+
+.nf-filter-tag:hover {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+}
+
+.nf-filter-tag-remove {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    font-size: 0.85rem;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.nf-filter-tag-remove:hover {
+    opacity: 1;
+    color: #dc2626;
+}
+
+html.dark .nf-filter-tag {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.3));
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+html.dark .nf-filter-tag:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.4));
+}
+
+/* Clear All Button */
+.nf-clear-all-btn {
+    padding: 8px 14px;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.nf-clear-all-btn:hover {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+}
+
+html.dark .nf-clear-all-btn {
+    background: rgba(220, 38, 38, 0.2);
+    color: #f87171;
+    border-color: rgba(220, 38, 38, 0.3);
+}
+
+html.dark .nf-clear-all-btn:hover {
+    background: #dc2626;
+    color: white;
+}
+
+/* ===== Sort Options ===== */
+.nf-sort-options {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nf-sort-label {
+    font-size: 0.9rem;
+    color: #64748b;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nf-sort-label i {
+    color: #667eea;
+}
+
+html.dark .nf-sort-label {
+    color: #94a3b8;
+}
+
+html.dark .nf-sort-label i {
+    color: #818cf8;
+}
+
+.nf-sort-select {
+    padding: 10px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    background: white;
+    cursor: pointer;
+    min-width: 160px;
+    transition: all 0.3s ease;
+}
+
+.nf-sort-select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+html.dark .nf-sort-select {
+    background: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+
+html.dark .nf-sort-select:focus {
+    border-color: #818cf8;
+}
+
+/* ===== View Toggle ===== */
+.nf-view-toggle {
+    display: flex;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 10px;
+}
+
+.nf-view-btn {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.nf-view-btn.active {
+    background: white;
+    color: #667eea;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.nf-view-btn:hover:not(.active) {
+    color: #1f2937;
+}
+
+html.dark .nf-view-toggle {
+    background: #334155;
+}
+
+html.dark .nf-view-btn.active {
+    background: #1e293b;
+    color: #818cf8;
+}
+
+/* ===== No Results ===== */
+.nf-no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+}
+
+.nf-no-results i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.nf-no-results h3 {
+    font-size: 1.3rem;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.nf-no-results p {
+    margin-bottom: 20px;
+}
+
+html.dark .nf-no-results h3 {
+    color: #94a3b8;
+}
+
+/* ===== Loading State ===== */
+.nf-filter-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.nf-filter-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #e5e7eb;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 992px) {
+    .nf-filters-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .nf-filters-section {
+        padding: 16px;
+    }
+    
+    .nf-filters-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .nf-filter-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .nf-results-count {
+        margin: 0;
+        justify-content: center;
+    }
+    
+    .nf-sort-options {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .nf-sort-select {
+        flex: 1;
+    }
+    
+    .nf-btn-filter {
+        justify-content: center;
+    }
+    
+    .nf-active-filters {
+        justify-content: center;
+    }
+}

@@ -1,0 +1,377 @@
+/**
+ * ========================================
+ * 📸 Enhanced Images Styles
+ * ========================================
+ */
+
+/* ===== Image Upload Section ===== */
+.nf-image-upload-section {
+    margin-top: 20px;
+}
+
+.upload-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.upload-header h5 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1f2937;
+    margin: 0;
+}
+
+html.dark .upload-header h5 {
+    color: #f1f5f9;
+}
+
+.image-count {
+    background: #667eea;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.category-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.category-selector label {
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+html.dark .category-selector label {
+    color: #94a3b8;
+}
+
+.category-selector select {
+    flex: 1;
+    max-width: 300px;
+}
+
+/* ===== Upload Area ===== */
+.upload-area {
+    border: 2px dashed #e5e7eb;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+}
+
+html.dark .upload-area {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+.upload-area:hover,
+.upload-area.drag-over {
+    border-color: #667eea;
+    background: #f0f5ff;
+}
+
+html.dark .upload-area:hover,
+html.dark .upload-area.drag-over {
+    background: #1e293b;
+}
+
+.upload-area i {
+    font-size: 3rem;
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.upload-area p {
+    color: #64748b;
+    margin: 5px 0;
+}
+
+html.dark .upload-area p {
+    color: #94a3b8;
+}
+
+.upload-area span {
+    display: block;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-top: 5px;
+}
+
+/* ===== Images by Category ===== */
+.images-by-category {
+    margin-top: 20px;
+}
+
+.no-images {
+    text-align: center;
+    padding: 30px;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+.category-group {
+    margin-bottom: 20px;
+}
+
+.category-group h6 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1f2937;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+html.dark .category-group h6 {
+    color: #f1f5f9;
+    border-bottom-color: #334155;
+}
+
+.category-group h6 i {
+    color: #667eea;
+}
+
+/* ===== Images Grid ===== */
+.images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+/* ===== Image Item ===== */
+.image-item {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+html.dark .image-item {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+.image-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.image-item img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+}
+
+.image-item.pdf {
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.pdf-icon {
+    font-size: 2rem;
+    color: #dc2626;
+    margin-bottom: 5px;
+}
+
+.pdf-icon i {
+    font-size: 2.5rem;
+}
+
+.file-name {
+    font-size: 0.7rem;
+    color: #64748b;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+html.dark .file-name {
+    color: #94a3b8;
+}
+
+/* ===== Image Actions ===== */
+.image-actions {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-item:hover .image-actions {
+    opacity: 1;
+}
+
+.image-item.pdf .image-actions {
+    bottom: 0;
+    top: auto;
+    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+}
+
+.btn-icon {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    color: #64748b;
+    transition: all 0.3s ease;
+}
+
+.btn-icon:hover {
+    background: #667eea;
+    color: white;
+}
+
+.btn-icon.danger:hover {
+    background: #dc2626;
+}
+
+/* ===== Lightbox ===== */
+.nf-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.lightbox-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.lightbox-content img {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    width: 36px;
+    height: 36px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1f2937;
+}
+
+.lightbox-close:hover {
+    background: #f1f5f9;
+}
+
+.lightbox-info {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 15px;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.lightbox-info span {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+
+/* ===== Image Categories Icons ===== */
+.category-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #667eea20;
+    border-radius: 6px;
+    color: #667eea;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .upload-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .category-selector {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .category-selector select {
+        width: 100%;
+        max-width: none;
+    }
+    
+    .images-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+    }
+    
+    .image-item img {
+        height: 80px;
+    }
+    
+    .image-item.pdf {
+        height: 80px;
+    }
+    
+    .pdf-icon i {
+        font-size: 2rem;
+    }
+    
+    .upload-area {
+        padding: 20px;
+    }
+    
+    .upload-area i {
+        font-size: 2rem;
+    }
+}

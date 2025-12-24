@@ -1,0 +1,355 @@
+/**
+ * ========================================
+ * ✅ Advanced Validation Styles - التحقق المتقدم
+ * ========================================
+ * 
+ * أنماط التحقق من صحة الحقول
+ * 
+ * ⚠️ لا يعدل أي CSS موجود - إضافة فقط!
+ */
+
+/* ===== Required Field Indicator ===== */
+.nf-required::after {
+    content: ' *';
+    color: #ef4444;
+    font-weight: 700;
+    margin-right: 2px;
+}
+
+/* ===== Input States ===== */
+
+/* Valid State */
+.nf-input-valid {
+    border-color: #10b981 !important;
+    background: #f0fdf4 !important;
+}
+
+.nf-input-valid:focus {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Invalid State */
+.nf-input-invalid {
+    border-color: #ef4444 !important;
+    background: #fef2f2 !important;
+    animation: nf-shake-input 0.4s ease;
+}
+
+.nf-input-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* Warning State */
+.nf-input-warning {
+    border-color: #f59e0b !important;
+    background: #fffbeb !important;
+}
+
+.nf-input-warning:focus {
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2) !important;
+}
+
+/* ===== Dark Mode States ===== */
+html.dark .nf-input-valid {
+    background: rgba(16, 185, 129, 0.1) !important;
+}
+
+html.dark .nf-input-invalid {
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+html.dark .nf-input-warning {
+    background: rgba(245, 158, 11, 0.1) !important;
+}
+
+/* ===== Validation Icon ===== */
+.nf-validation-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+[dir="rtl"] .nf-validation-icon {
+    left: auto;
+    right: 15px;
+}
+
+.nf-input-valid ~ .nf-validation-icon,
+.nf-input-invalid ~ .nf-validation-icon {
+    opacity: 1;
+}
+
+.nf-input-valid ~ .nf-validation-icon {
+    color: #10b981;
+}
+
+.nf-input-invalid ~ .nf-validation-icon {
+    color: #ef4444;
+}
+
+/* ===== Error Message ===== */
+.nf-error-message {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    color: #ef4444;
+    background: #fef2f2;
+    border-radius: 8px;
+    border-right: 3px solid #ef4444;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+[dir="rtl"] .nf-error-message {
+    border-right: none;
+    border-left: 3px solid #ef4444;
+}
+
+.nf-error-message.nf-show {
+    opacity: 1;
+    max-height: 100px;
+}
+
+.nf-error-message i {
+    color: #ef4444;
+    font-size: 0.9rem;
+}
+
+/* ===== Dark Mode Error Message ===== */
+html.dark .nf-error-message {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+/* ===== Success Message ===== */
+.nf-success-message {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    color: #059669;
+    background: #f0fdf4;
+    border-radius: 8px;
+    border-right: 3px solid #10b981;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+[dir="rtl"] .nf-success-message {
+    border-right: none;
+    border-left: 3px solid #10b981;
+}
+
+.nf-success-message.nf-show {
+    opacity: 1;
+    max-height: 100px;
+}
+
+html.dark .nf-success-message {
+    background: rgba(16, 185, 129, 0.15);
+}
+
+/* ===== Warning Message ===== */
+.nf-warning-message {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    color: #d97706;
+    background: #fffbeb;
+    border-radius: 8px;
+    border-right: 3px solid #f59e0b;
+}
+
+[dir="rtl"] .nf-warning-message {
+    border-right: none;
+    border-left: 3px solid #f59e0b;
+}
+
+html.dark .nf-warning-message {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+/* ===== Form Group with Validation ===== */
+.nf-form-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.nf-form-group.nf-has-error .nf-error-message {
+    opacity: 1;
+    max-height: 100px;
+}
+
+.nf-form-group.nf-has-success .nf-success-message {
+    opacity: 1;
+    max-height: 100px;
+}
+
+/* ===== Shake Animation ===== */
+@keyframes nf-shake-input {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+    20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
+/* ===== Password Strength Indicator ===== */
+.nf-password-strength {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.nf-password-strength-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: #e5e7eb;
+    transition: background 0.3s ease;
+}
+
+.nf-password-strength[data-strength="1"] .nf-password-strength-bar:nth-child(1) {
+    background: #ef4444;
+}
+
+.nf-password-strength[data-strength="2"] .nf-password-strength-bar:nth-child(-n+2) {
+    background: #f59e0b;
+}
+
+.nf-password-strength[data-strength="3"] .nf-password-strength-bar:nth-child(-n+3) {
+    background: #3b82f6;
+}
+
+.nf-password-strength[data-strength="4"] .nf-password-strength-bar {
+    background: #10b981;
+}
+
+.nf-password-strength-text {
+    font-size: 0.8rem;
+    margin-top: 4px;
+    color: #64748b;
+}
+
+html.dark .nf-password-strength-bar {
+    background: #374151;
+}
+
+/* ===== Character Counter ===== */
+.nf-char-counter {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.nf-char-counter.nf-warning {
+    color: #f59e0b;
+}
+
+.nf-char-counter.nf-error {
+    color: #ef4444;
+}
+
+/* ===== Inline Validation Tooltip ===== */
+.nf-validation-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-5px);
+    background: #1f2937;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.nf-validation-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1f2937;
+}
+
+.nf-form-group:hover .nf-validation-tooltip,
+.nf-form-group:focus-within .nf-validation-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-10px);
+}
+
+/* ===== Form Validation Summary ===== */
+.nf-validation-summary {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.nf-validation-summary h4 {
+    color: #dc2626;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nf-validation-summary ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nf-validation-summary li {
+    color: #dc2626;
+    font-size: 0.9rem;
+    padding: 4px 0;
+    padding-right: 20px;
+    position: relative;
+}
+
+.nf-validation-summary li::before {
+    content: '•';
+    position: absolute;
+    right: 5px;
+}
+
+[dir="rtl"] .nf-validation-summary li {
+    padding-right: 0;
+    padding-left: 20px;
+}
+
+[dir="rtl"] .nf-validation-summary li::before {
+    right: auto;
+    left: 5px;
+}
+
+html.dark .nf-validation-summary {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+}

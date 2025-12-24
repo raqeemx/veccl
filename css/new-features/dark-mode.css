@@ -1,0 +1,368 @@
+/**
+ * ========================================
+ * 🌙 Dark Mode Styles - نظام الوضع الليلي
+ * ========================================
+ * 
+ * هذا الملف يحتوي على جميع أنماط الوضع الليلي
+ * يُستخدم مع class "dark" على عنصر html
+ * 
+ * ⚠️ لا يعدل أي CSS موجود - إضافة فقط!
+ */
+
+/* ===== Dark Mode CSS Variables ===== */
+html.dark {
+    --nf-bg-primary: #0f172a;
+    --nf-bg-secondary: #1e293b;
+    --nf-bg-card: #1e293b;
+    --nf-bg-input: #334155;
+    --nf-text-primary: #f1f5f9;
+    --nf-text-secondary: #94a3b8;
+    --nf-text-muted: #64748b;
+    --nf-border-color: #334155;
+    --nf-shadow-color: rgba(0, 0, 0, 0.5);
+    
+    /* Primary colors adjusted for dark mode */
+    --nf-primary: #818cf8;
+    --nf-primary-dark: #6366f1;
+    --nf-secondary: #a78bfa;
+    
+    /* Status colors */
+    --nf-success: #34d399;
+    --nf-warning: #fbbf24;
+    --nf-danger: #f87171;
+    --nf-info: #60a5fa;
+}
+
+/* ===== Base Dark Mode Styles ===== */
+
+/* Body Background - للصفحات الداخلية */
+html.dark body {
+    background: var(--nf-bg-primary) !important;
+    color: var(--nf-text-primary) !important;
+}
+
+/* ===== Cards & Containers ===== */
+html.dark .auth-card,
+html.dark .modal-content,
+html.dark .stat-card,
+html.dark .vehicle-card,
+html.dark .sidebar,
+html.dark .top-bar,
+html.dark .loading-content {
+    background: var(--nf-bg-card) !important;
+    border-color: var(--nf-border-color) !important;
+}
+
+/* Sidebar specific */
+html.dark .sidebar {
+    box-shadow: -2px 0 10px var(--nf-shadow-color) !important;
+}
+
+/* ===== Form Elements ===== */
+html.dark .form-input,
+html.dark input[type="text"],
+html.dark input[type="email"],
+html.dark input[type="password"],
+html.dark input[type="number"],
+html.dark textarea,
+html.dark select {
+    background: var(--nf-bg-input) !important;
+    border-color: var(--nf-border-color) !important;
+    color: var(--nf-text-primary) !important;
+}
+
+html.dark .form-input:focus,
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark select:focus {
+    border-color: var(--nf-primary) !important;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2) !important;
+}
+
+html.dark .form-input::placeholder,
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: var(--nf-text-muted) !important;
+}
+
+/* ===== Text Colors ===== */
+html.dark h1, html.dark h2, html.dark h3, 
+html.dark h4, html.dark h5, html.dark h6 {
+    color: var(--nf-text-primary) !important;
+}
+
+html.dark p,
+html.dark span,
+html.dark label,
+html.dark .form-group label {
+    color: var(--nf-text-secondary) !important;
+}
+
+html.dark .text-gray-500,
+html.dark .text-gray-600 {
+    color: var(--nf-text-muted) !important;
+}
+
+/* ===== Sidebar Menu ===== */
+html.dark .menu-item {
+    color: var(--nf-text-secondary) !important;
+}
+
+html.dark .menu-item:hover,
+html.dark .menu-item.active {
+    background: var(--nf-bg-input) !important;
+    color: var(--nf-primary) !important;
+}
+
+/* ===== Tabs ===== */
+html.dark .auth-tabs {
+    background: var(--nf-bg-input) !important;
+}
+
+html.dark .auth-tab {
+    color: var(--nf-text-muted) !important;
+}
+
+html.dark .auth-tab.active {
+    background: var(--nf-bg-card) !important;
+    color: var(--nf-primary) !important;
+}
+
+html.dark .auth-tab:hover:not(.active) {
+    color: var(--nf-text-primary) !important;
+}
+
+/* ===== Buttons ===== */
+html.dark .btn-social,
+html.dark .btn:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-info) {
+    background: var(--nf-bg-input) !important;
+    border-color: var(--nf-border-color) !important;
+    color: var(--nf-text-primary) !important;
+}
+
+html.dark .btn-social:hover {
+    border-color: var(--nf-primary) !important;
+    background: var(--nf-bg-secondary) !important;
+}
+
+/* ===== Vehicle Cards ===== */
+html.dark .vehicle-title,
+html.dark .stat-value {
+    color: var(--nf-text-primary) !important;
+}
+
+html.dark .vehicle-id,
+html.dark .detail-item,
+html.dark .stat-label {
+    color: var(--nf-text-muted) !important;
+}
+
+html.dark .vehicle-value {
+    background: var(--nf-bg-input) !important;
+}
+
+/* ===== Stats Cards ===== */
+html.dark .stats-grid .stat-card {
+    background: var(--nf-bg-card) !important;
+    box-shadow: 0 2px 10px var(--nf-shadow-color) !important;
+}
+
+/* ===== Modals ===== */
+html.dark .modal {
+    background: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark .modal-content {
+    background: var(--nf-bg-card) !important;
+}
+
+html.dark .modal-header,
+html.dark .modal-footer {
+    border-color: var(--nf-border-color) !important;
+}
+
+/* ===== Alerts ===== */
+html.dark .alert-error {
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: var(--nf-danger) !important;
+}
+
+html.dark .alert-success {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    color: var(--nf-success) !important;
+}
+
+html.dark .alert-info {
+    background: rgba(59, 130, 246, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+    color: var(--nf-info) !important;
+}
+
+html.dark .alert-warning {
+    background: rgba(245, 158, 11, 0.15) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+    color: var(--nf-warning) !important;
+}
+
+/* ===== Dividers ===== */
+html.dark .divider::before,
+html.dark .divider::after {
+    background: var(--nf-border-color) !important;
+}
+
+html.dark .divider span {
+    color: var(--nf-text-muted) !important;
+}
+
+/* ===== Links ===== */
+html.dark a:not(.btn) {
+    color: var(--nf-primary) !important;
+}
+
+html.dark .forgot-link {
+    color: var(--nf-primary) !important;
+}
+
+/* ===== Features List ===== */
+html.dark .features-list {
+    border-top-color: var(--nf-border-color) !important;
+}
+
+html.dark .feature-item span {
+    color: var(--nf-text-muted) !important;
+}
+
+/* ===== Loading Overlay ===== */
+html.dark .loading-overlay {
+    background: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark .loading-content {
+    background: var(--nf-bg-card) !important;
+    color: var(--nf-text-primary) !important;
+}
+
+html.dark .loading-spinner {
+    border-color: var(--nf-border-color) !important;
+    border-top-color: var(--nf-primary) !important;
+}
+
+/* ===== Connection Status ===== */
+html.dark .connection-status {
+    box-shadow: 0 4px 15px var(--nf-shadow-color) !important;
+}
+
+/* ===== Empty State ===== */
+html.dark .empty-state {
+    color: var(--nf-text-muted) !important;
+}
+
+/* ===== Section Headers ===== */
+html.dark .section-header h2 {
+    color: var(--nf-text-primary) !important;
+}
+
+/* ===== Input Wrapper Icon ===== */
+html.dark .input-wrapper i.input-icon,
+html.dark .input-wrapper i {
+    color: var(--nf-text-muted) !important;
+}
+
+/* ===== Remember Me ===== */
+html.dark .remember-me span {
+    color: var(--nf-text-secondary) !important;
+}
+
+/* ===== User Info ===== */
+html.dark .user-info {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+html.dark .user-details h3,
+html.dark .user-details p {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* ===== Scrollbar ===== */
+html.dark ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+    background: var(--nf-bg-secondary);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+    background: var(--nf-border-color);
+    border-radius: 5px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--nf-text-muted);
+}
+
+/* ===== Dark Mode Toggle Button ===== */
+.nf-dark-mode-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    z-index: 9999;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nf-dark-mode-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+html.dark .nf-dark-mode-toggle {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+
+html.dark .nf-dark-mode-toggle:hover {
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+}
+
+/* ===== Print Styles - Disable Dark Mode ===== */
+@media print {
+    html.dark body,
+    html.dark .auth-card,
+    html.dark .modal-content,
+    html.dark .stat-card,
+    html.dark .vehicle-card {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .nf-dark-mode-toggle {
+        display: none !important;
+    }
+}
+
+/* ===== Transition for Dark Mode ===== */
+html {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html *:not(script):not(style) {
+    transition: background-color 0.3s ease, 
+                border-color 0.3s ease, 
+                color 0.3s ease,
+                box-shadow 0.3s ease;
+}
