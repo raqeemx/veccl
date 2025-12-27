@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="css/new-features/warehouse.css">
     <link rel="stylesheet" href="css/new-features/inventory.css">
     <link rel="stylesheet" href="css/new-features/audit-log.css">
-    <link rel="stylesheet" href="css/new-features/qrcode.css">
     <link rel="stylesheet" href="css/new-features/enhanced-images.css">
     
     <!-- External Libraries -->
@@ -1793,7 +1792,10 @@
         // تعبئة قائمة المستودعات
         function populateWarehouseSelect() {
             const select = document.getElementById('warehouseId');
-            if (!select) return;
+            if (!select) {
+                console.warn('Warehouse select element not found');
+                return;
+            }
             
             // حفظ القيمة الحالية
             const currentValue = select.value;
@@ -1801,14 +1803,27 @@
             // إعادة بناء الخيارات
             select.innerHTML = '<option value="">-- اختر الموقع --</option>';
             
-            if (window.NFWarehouse) {
-                const warehouses = NFWarehouse.getWarehouses();
-                warehouses.filter(w => w.isActive !== false).forEach(w => {
-                    const option = document.createElement('option');
-                    option.value = w.id;
-                    option.textContent = w.name + (w.city ? ' - ' + w.city : '');
-                    select.appendChild(option);
-                });
+            // التحقق من توفر NFWarehouse
+            if (window.NFWarehouse && typeof NFWarehouse.getWarehouses === 'function') {
+                try {
+                    const warehouses = NFWarehouse.getWarehouses();
+                    console.log('Loaded warehouses:', warehouses.length);
+                    
+                    if (warehouses && warehouses.length > 0) {
+                        warehouses.filter(w => w.isActive !== false).forEach(w => {
+                            const option = document.createElement('option');
+                            option.value = w.id;
+                            option.textContent = w.name + (w.city ? ' - ' + w.city : '');
+                            select.appendChild(option);
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error loading warehouses:', e);
+                }
+            } else {
+                console.warn('NFWarehouse not available, retrying...');
+                // إعادة المحاولة بعد فترة قصيرة
+                setTimeout(populateWarehouseSelect, 500);
             }
             
             // استعادة القيمة السابقة
@@ -2616,7 +2631,6 @@
     <script src="js/new-features/roles-permissions.js"></script>
     <script src="js/new-features/inventory-campaigns.js"></script>
     <script src="js/new-features/audit-log.js"></script>
-    <script src="js/new-features/qrcode-scanner.js"></script>
     <script src="js/new-features/pdf-reports.js"></script>
     <script src="js/new-features/enhanced-images.js"></script>
     <script src="js/new-features/dashboard-integration.js"></script>
@@ -2787,6 +2801,19 @@
                     showSuccessState: true
                 });
             }
+            
+            // تهيئة قائمة المستودعات عند تحميل الصفحة
+            // تأخير أطول لضمان تحميل NFWarehouse
+            setTimeout(function() {
+                if (window.NFWarehouse) {
+                    populateWarehouseSelect();
+                    console.log('Warehouse select initialized successfully');
+                } else {
+                    console.log('Waiting for NFWarehouse...');
+                    // إعادة المحاولة
+                    setTimeout(populateWarehouseSelect, 1000);
+                }
+            }, 2000);
         });
         
         // Update enhanced stats when vehicles change

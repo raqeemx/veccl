@@ -5,7 +5,7 @@
  * 
  * ربط جميع الميزات الجديدة مع لوحة التحكم
  * 
- * الإصدار 1.0
+ * الإصدار 2.0 - بدون QR
  */
 
 // ===== Wait for DOM to be ready =====
@@ -40,7 +40,6 @@ function initializeNewFeatures() {
     
     // Initialize enhanced stats
     if (window.NFStats) {
-        // Override the updateStats function
         const originalUpdateStats = window.updateStats || function() {};
         window.updateStats = function() {
             originalUpdateStats();
@@ -67,7 +66,7 @@ function addNewSidebarItems() {
     const existingItems = sidebarMenu.querySelectorAll('.menu-item');
     let insertAfter = existingItems[1]; // After vehicles
     
-    // New menu items HTML
+    // New menu items HTML (بدون QR)
     const newItemsHTML = `
         <div class="menu-item" onclick="openWarehousesModal()">
             <i class="fas fa-warehouse"></i>
@@ -79,15 +78,11 @@ function addNewSidebarItems() {
         </div>
         <div class="menu-item" onclick="openUsersModal()" data-permission="manage_users">
             <i class="fas fa-users-cog"></i>
-            <span>الصلاحيات</span>
+            <span>إدارة المستخدمين</span>
         </div>
         <div class="menu-item" onclick="openAuditLogModal()">
             <i class="fas fa-history"></i>
             <span>سجل التغييرات</span>
-        </div>
-        <div class="menu-item" onclick="openQRScannerModal()">
-            <i class="fas fa-qrcode"></i>
-            <span>مسح QR</span>
         </div>
         <div class="menu-item" onclick="openReportsModal()">
             <i class="fas fa-file-pdf"></i>
@@ -150,16 +145,8 @@ function filterVehiclesByWarehouse(warehouseId) {
         `;
     } else {
         // Use the original render function but with filtered data
-        if (typeof renderVehiclesCustom === 'function') {
-            renderVehiclesCustom(filtered);
-        } else {
-            // Temporarily replace vehicles and render
-            const originalVehicles = vehicles;
-            vehicles = filtered;
-            if (typeof renderVehicles === 'function') {
-                renderVehicles();
-            }
-            vehicles = originalVehicles;
+        if (typeof renderFilteredVehicles === 'function') {
+            renderFilteredVehicles(filtered);
         }
     }
 }
@@ -181,7 +168,6 @@ function enhanceVehicleCards() {
             if (typeof vehicles !== 'undefined' && vehicles[index]) {
                 const vehicle = vehicles[index];
                 addWarehouseBadge(card, vehicle);
-                addQRButton(card, vehicle);
             }
         });
     };
@@ -208,43 +194,6 @@ function addWarehouseBadge(card, vehicle) {
             titleDiv.appendChild(badge);
         }
     }
-}
-
-// ===== Add QR Button to Card =====
-function addQRButton(card, vehicle) {
-    const actionsDiv = card.querySelector('.vehicle-actions');
-    if (!actionsDiv) return;
-    
-    // Check if already added
-    if (actionsDiv.querySelector('.btn-qr')) return;
-    
-    const qrButton = document.createElement('button');
-    qrButton.className = 'btn-view btn-qr';
-    qrButton.innerHTML = '<i class="fas fa-qrcode"></i>';
-    qrButton.title = 'رمز QR';
-    qrButton.onclick = function(e) {
-        e.stopPropagation();
-        showVehicleQR(vehicle);
-    };
-    
-    actionsDiv.insertBefore(qrButton, actionsDiv.firstChild);
-}
-
-// ===== Show Vehicle QR =====
-async function showVehicleQR(vehicle) {
-    if (!window.NFQRCode) return;
-    
-    const html = `
-        <div id="qrCodeDisplay" style="text-align: center; padding: 20px;">
-            <p>جاري إنشاء رمز QR...</p>
-        </div>
-    `;
-    
-    showCustomModal(html, 'رمز QR للمركبة');
-    
-    setTimeout(async () => {
-        await NFQRCode.createQRCodeElement(vehicle, 'qrCodeDisplay');
-    }, 100);
 }
 
 // ===== Modal Functions =====
@@ -292,11 +241,6 @@ function openUsersModal() {
         return;
     }
     
-    if (!NFRoles.hasPermission('manage_users')) {
-        showNotification('ليس لديك صلاحية لإدارة المستخدمين', 'error');
-        return;
-    }
-    
     const content = NFRoles.createUsersModalContent();
     showCustomModal(content, 'إدارة المستخدمين والصلاحيات');
 }
@@ -312,47 +256,27 @@ function openAuditLogModal() {
     showCustomModal(content, 'سجل التغييرات');
 }
 
-// QR Scanner Modal
-function openQRScannerModal() {
-    if (!window.NFQRCode) {
-        showNotification('ميزة مسح QR غير متاحة', 'warning');
-        return;
-    }
-    
-    NFQRCode.openScanner(function(vehicle) {
-        console.log('Vehicle found:', vehicle);
-        if (vehicle && vehicle.id && typeof viewVehicle === 'function') {
-            NFQRCode.closeScannerModal();
-            viewVehicle(vehicle.id);
-        }
-    });
-}
-
-// Reports Modal
+// Reports Modal (بدون QR)
 function openReportsModal() {
     const content = `
         <div class="reports-modal-content">
             <h4><i class="fas fa-file-pdf"></i> تصدير التقارير</h4>
             <div class="reports-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
-                <button class="btn btn-outline report-btn" onclick="exportFullInventoryReport()">
-                    <i class="fas fa-list"></i>
+                <button class="btn btn-outline report-btn" onclick="exportFullInventoryReport()" style="padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                    <i class="fas fa-list" style="font-size: 2rem; color: #667eea;"></i>
                     <span>تقرير الجرد الشامل</span>
                 </button>
-                <button class="btn btn-outline report-btn" onclick="exportWarehouseReport()">
-                    <i class="fas fa-warehouse"></i>
+                <button class="btn btn-outline report-btn" onclick="exportWarehouseReport()" style="padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                    <i class="fas fa-warehouse" style="font-size: 2rem; color: #16a34a;"></i>
                     <span>تقرير المستودعات</span>
                 </button>
-                <button class="btn btn-outline report-btn" onclick="exportAllToExcel()">
-                    <i class="fas fa-file-excel"></i>
+                <button class="btn btn-outline report-btn" onclick="exportAllToExcel()" style="padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                    <i class="fas fa-file-excel" style="font-size: 2rem; color: #059669;"></i>
                     <span>تصدير Excel</span>
                 </button>
-                <button class="btn btn-outline report-btn" onclick="exportToJSON()">
-                    <i class="fas fa-file-code"></i>
+                <button class="btn btn-outline report-btn" onclick="exportToJSON()" style="padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                    <i class="fas fa-file-code" style="font-size: 2rem; color: #f59e0b;"></i>
                     <span>تصدير JSON</span>
-                </button>
-                <button class="btn btn-outline report-btn" onclick="printBatchQRCodes()">
-                    <i class="fas fa-qrcode"></i>
-                    <span>طباعة رموز QR</span>
                 </button>
             </div>
         </div>
@@ -372,13 +296,6 @@ function exportFullInventoryReport() {
 function exportWarehouseReport() {
     if (window.NFReports) {
         NFReports.exportWarehouseReport('all');
-        closeCustomModal();
-    }
-}
-
-function printBatchQRCodes() {
-    if (window.NFQRCode && typeof vehicles !== 'undefined') {
-        NFQRCode.printBatchQRCodes(vehicles);
         closeCustomModal();
     }
 }
@@ -429,9 +346,18 @@ function closeCustomModal() {
     }
 }
 
-// Also make these available for edit role modal
+// Make functions globally available
+window.openWarehousesModal = openWarehousesModal;
+window.openInventoryCampaignsModal = openInventoryCampaignsModal;
+window.openUsersModal = openUsersModal;
+window.openAuditLogModal = openAuditLogModal;
+window.openReportsModal = openReportsModal;
+window.showCustomModal = showCustomModal;
+window.closeCustomModal = closeCustomModal;
 window.closeEditRoleModal = closeCustomModal;
 window.closeTransferModal = closeCustomModal;
+window.exportFullInventoryReport = exportFullInventoryReport;
+window.exportWarehouseReport = exportWarehouseReport;
 
 // ===== Vehicle Warehouse Update =====
 function updateVehicleWarehouse(vehicleId, warehouseId) {
@@ -448,28 +374,15 @@ function updateVehicleWarehouse(vehicleId, warehouseId) {
                 if (window.NFAuditLog) {
                     NFAuditLog.log('vehicle_transferred', { vehicleId, warehouseId });
                 }
+                showNotification('تم تحديث موقع المركبة', 'success');
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error updating warehouse:', error);
+                showNotification('حدث خطأ أثناء تحديث الموقع', 'error');
             });
     }
 }
 
-// ===== Get Vehicles Function (for other modules) =====
-window.getVehicles = function() {
-    return typeof vehicles !== 'undefined' ? vehicles : [];
-};
-
-// ===== Make functions globally available =====
-window.showCustomModal = showCustomModal;
-window.closeCustomModal = closeCustomModal;
-window.openWarehousesModal = openWarehousesModal;
-window.openInventoryCampaignsModal = openInventoryCampaignsModal;
-window.openUsersModal = openUsersModal;
-window.openAuditLogModal = openAuditLogModal;
-window.openQRScannerModal = openQRScannerModal;
-window.openReportsModal = openReportsModal;
 window.updateVehicleWarehouse = updateVehicleWarehouse;
-window.showVehicleQR = showVehicleQR;
 
-console.log('Dashboard Integration module loaded');
+console.log('🔗 Dashboard Integration v2.0 loaded - Without QR');
