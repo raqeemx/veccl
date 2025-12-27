@@ -1778,7 +1778,43 @@
             document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle" style="margin-left: 10px;"></i>إضافة مركبة جديدة';
             document.getElementById('vehicleForm').reset();
             document.getElementById('imagePreviewContainer').innerHTML = '';
+            
+            // تعبئة قائمة المستودعات
+            populateWarehouseSelect();
+            
+            // تعيين مسؤول الجرد الافتراضي للمستخدم الحالي
+            if (document.getElementById('inventoryBy') && currentUser) {
+                document.getElementById('inventoryBy').value = currentUser.displayName || currentUser.email || '';
+            }
+            
             document.getElementById('vehicleModal').classList.add('show');
+        }
+        
+        // تعبئة قائمة المستودعات
+        function populateWarehouseSelect() {
+            const select = document.getElementById('warehouseId');
+            if (!select) return;
+            
+            // حفظ القيمة الحالية
+            const currentValue = select.value;
+            
+            // إعادة بناء الخيارات
+            select.innerHTML = '<option value="">-- اختر الموقع --</option>';
+            
+            if (window.NFWarehouse) {
+                const warehouses = NFWarehouse.getWarehouses();
+                warehouses.filter(w => w.isActive !== false).forEach(w => {
+                    const option = document.createElement('option');
+                    option.value = w.id;
+                    option.textContent = w.name + (w.city ? ' - ' + w.city : '');
+                    select.appendChild(option);
+                });
+            }
+            
+            // استعادة القيمة السابقة
+            if (currentValue) {
+                select.value = currentValue;
+            }
         }
 
         function editVehicle(id) {
@@ -1789,7 +1825,7 @@
             pendingImages = vehicle.images || [];
             document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit" style="margin-left: 10px;"></i>تعديل المركبة';
             
-            // Fill form
+            // Fill basic form fields
             document.getElementById('contractNo').value = vehicle.contractNo || '';
             document.getElementById('customerName').value = vehicle.customerName || '';
             document.getElementById('make').value = vehicle.make || '';
@@ -1806,6 +1842,46 @@
             document.getElementById('recoveryLocation').value = vehicle.recoveryLocation || '';
             document.getElementById('recommendation').value = vehicle.recommendation || '';
             document.getElementById('notes').value = vehicle.notes || '';
+            
+            // ===== تعبئة الحقول الإضافية v5.0 =====
+            if (document.getElementById('warehouseId')) {
+                document.getElementById('warehouseId').value = vehicle.warehouseId || '';
+            }
+            if (document.getElementById('operationalStatus')) {
+                document.getElementById('operationalStatus').value = vehicle.operationalStatus || '';
+            }
+            if (document.getElementById('fuelLevel')) {
+                document.getElementById('fuelLevel').value = vehicle.fuelLevel || '';
+            }
+            if (document.getElementById('keysStatus')) {
+                document.getElementById('keysStatus').value = vehicle.keysStatus || '';
+            }
+            if (document.getElementById('tiresCondition')) {
+                document.getElementById('tiresCondition').value = vehicle.tiresCondition || '';
+            }
+            if (document.getElementById('batteryCondition')) {
+                document.getElementById('batteryCondition').value = vehicle.batteryCondition || '';
+            }
+            if (document.getElementById('insurancePolicy')) {
+                document.getElementById('insurancePolicy').value = vehicle.insurancePolicy || '';
+            }
+            if (document.getElementById('registrationExpiry')) {
+                document.getElementById('registrationExpiry').value = vehicle.registrationExpiry || '';
+            }
+            if (document.getElementById('lastServiceDate')) {
+                document.getElementById('lastServiceDate').value = vehicle.lastServiceDate || '';
+            }
+            if (document.getElementById('inventoryBy')) {
+                document.getElementById('inventoryBy').value = vehicle.inventoryBy || '';
+            }
+            if (document.getElementById('technicalNotes')) {
+                document.getElementById('technicalNotes').value = vehicle.technicalNotes || '';
+            }
+            
+            // تعبئة الإكسسوارات
+            document.querySelectorAll('input[name="accessories"]').forEach(cb => {
+                cb.checked = vehicle.accessories?.includes(cb.value) || false;
+            });
             
             // Show existing images
             renderImagePreviews();
@@ -1887,6 +1963,65 @@
                         <span>${vehicle.notes || '-'}</span>
                     </div>
                 </div>
+                
+                <!-- ===== بيانات الجرد الإضافية v5.0 ===== -->
+                <h4 style="margin-top: 25px; margin-bottom: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
+                    <i class="fas fa-clipboard-list" style="margin-left: 8px; color: var(--primary);"></i>
+                    بيانات الجرد
+                </h4>
+                <div class="view-details-grid">
+                    <div class="view-detail-item">
+                        <label>الموقع/المستودع</label>
+                        <span>${getWarehouseNameById(vehicle.warehouseId)}</span>
+                    </div>
+                    <div class="view-detail-item">
+                        <label>حالة التشغيل</label>
+                        <span>${getOperationalStatusText(vehicle.operationalStatus)}</span>
+                    </div>
+                    <div class="view-detail-item">
+                        <label>مستوى الوقود</label>
+                        <span>${getFuelLevelText(vehicle.fuelLevel)}</span>
+                    </div>
+                    <div class="view-detail-item">
+                        <label>حالة المفاتيح</label>
+                        <span>${getKeysStatusText(vehicle.keysStatus)}</span>
+                    </div>
+                    <div class="view-detail-item">
+                        <label>حالة الإطارات</label>
+                        <span>${getTiresConditionText(vehicle.tiresCondition)}</span>
+                    </div>
+                    <div class="view-detail-item">
+                        <label>حالة البطارية</label>
+                        <span>${getBatteryConditionText(vehicle.batteryCondition)}</span>
+                    </div>
+                    <div class="view-detail-item">
+                        <label>رقم بوليصة التأمين</label>
+                        <span>${vehicle.insurancePolicy || '-'}</span>
+                    </div>
+                    <div class="view-detail-item">
+                        <label>تاريخ انتهاء الاستمارة</label>
+                        <span>${vehicle.registrationExpiry || '-'}</span>
+                    </div>
+                    <div class="view-detail-item">
+                        <label>تاريخ آخر صيانة</label>
+                        <span>${vehicle.lastServiceDate || '-'}</span>
+                    </div>
+                    <div class="view-detail-item">
+                        <label>مسؤول الجرد</label>
+                        <span>${vehicle.inventoryBy || '-'}</span>
+                    </div>
+                    <div class="view-detail-item" style="grid-column: 1 / -1;">
+                        <label>الإكسسوارات</label>
+                        <span>${getAccessoriesText(vehicle.accessories)}</span>
+                    </div>
+                    ${vehicle.technicalNotes ? `
+                    <div class="view-detail-item" style="grid-column: 1 / -1;">
+                        <label>الحالة الفنية التفصيلية</label>
+                        <span>${vehicle.technicalNotes}</span>
+                    </div>
+                    ` : ''}
+                </div>
+                
                 ${vehicle.images && vehicle.images.length > 0 ? `
                     <h4 style="margin-top: 25px; margin-bottom: 15px;">
                         <i class="fas fa-images" style="margin-left: 8px; color: var(--primary);"></i>
@@ -1924,6 +2059,81 @@
             };
             return recs[rec] || '-';
         }
+        
+        // ===== Helper Functions للحقول الإضافية v5.0 =====
+        function getWarehouseNameById(warehouseId) {
+            if (!warehouseId) return 'غير مخصص';
+            if (window.NFWarehouse) {
+                const warehouse = NFWarehouse.getWarehouseById(warehouseId);
+                return warehouse?.name || 'غير معروف';
+            }
+            return warehouseId;
+        }
+        
+        function getOperationalStatusText(status) {
+            const statuses = {
+                'working': 'تعمل بشكل جيد',
+                'needs_repair': 'تحتاج صيانة',
+                'not_working': 'لا تعمل'
+            };
+            return statuses[status] || '-';
+        }
+        
+        function getFuelLevelText(level) {
+            const levels = {
+                'full': 'ممتلئ',
+                'three_quarters': 'ثلاثة أرباع',
+                'half': 'نصف',
+                'quarter': 'ربع',
+                'empty': 'فارغ'
+            };
+            return levels[level] || '-';
+        }
+        
+        function getKeysStatusText(status) {
+            const statuses = {
+                '2_keys': 'مفتاحان',
+                '1_key': 'مفتاح واحد',
+                'no_keys': 'بدون مفاتيح'
+            };
+            return statuses[status] || '-';
+        }
+        
+        function getTiresConditionText(condition) {
+            const conditions = {
+                'excellent': 'ممتازة (جديدة)',
+                'good': 'جيدة',
+                'fair': 'مقبولة',
+                'poor': 'سيئة (تحتاج تبديل)'
+            };
+            return conditions[condition] || '-';
+        }
+        
+        function getBatteryConditionText(condition) {
+            const conditions = {
+                'good': 'جيدة',
+                'weak': 'ضعيفة',
+                'dead': 'ميتة'
+            };
+            return conditions[condition] || '-';
+        }
+        
+        function getAccessoriesText(accessories) {
+            if (!accessories || accessories.length === 0) return 'لا يوجد';
+            const labels = {
+                'spare_tire': 'الإطار الاحتياطي',
+                'jack': 'الرافعة',
+                'tool_kit': 'عدة الأدوات',
+                'fire_extinguisher': 'طفاية الحريق',
+                'first_aid': 'حقيبة الإسعافات',
+                'manual': 'دليل المالك',
+                'radio': 'الراديو/الشاشة',
+                'camera': 'كاميرا خلفية',
+                'gps': 'نظام ملاحة',
+                'sunroof': 'فتحة سقف'
+            };
+            return accessories.map(a => labels[a] || a).join(' • ');
+        }
 
         function editFromView() {
             closeViewModal();
@@ -1944,23 +2154,32 @@
         // ========================================
         function handleImageUpload(event) {
             const files = Array.from(event.target.files);
-            const maxSize = 5 * 1024 * 1024; // 5MB
-            const maxImages = 3;
+            const maxImageSize = 10 * 1024 * 1024; // 10MB للصور
+            const maxPdfSize = 20 * 1024 * 1024; // 20MB لـ PDF
+            const maxImages = 20; // حد أقصى 20 صورة/ملف
             
             if (pendingImages.length + files.length > maxImages) {
-                showNotification(`يمكنك رفع ${maxImages} صور كحد أقصى`, 'warning');
+                showNotification(`يمكنك رفع ${maxImages} صور/ملفات كحد أقصى`, 'warning');
                 return;
             }
             
             files.forEach(file => {
+                const isPdf = file.type === 'application/pdf';
+                const maxSize = isPdf ? maxPdfSize : maxImageSize;
+                
                 if (file.size > maxSize) {
-                    showNotification(`الصورة ${file.name} أكبر من 5MB`, 'warning');
+                    showNotification(`الملف ${file.name} أكبر من ${isPdf ? '20' : '10'}MB`, 'warning');
                     return;
                 }
                 
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    pendingImages.push(e.target.result);
+                    pendingImages.push({
+                        data: e.target.result,
+                        name: file.name,
+                        type: file.type,
+                        isPdf: isPdf
+                    });
                     renderImagePreviews();
                 };
                 reader.readAsDataURL(file);
@@ -1971,14 +2190,33 @@
         
         function renderImagePreviews() {
             const container = document.getElementById('imagePreviewContainer');
-            container.innerHTML = pendingImages.map((img, index) => `
-                <div class="image-preview-item">
-                    <img src="${img}" alt="Preview">
-                    <button class="image-preview-remove" onclick="removeImage(${index})">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `).join('');
+            container.innerHTML = pendingImages.map((img, index) => {
+                // دعم الهيكل الجديد والقديم للصور
+                const isObject = typeof img === 'object';
+                const imageData = isObject ? img.data : img;
+                const isPdf = isObject ? img.isPdf : false;
+                const fileName = isObject ? img.name : '';
+                
+                if (isPdf) {
+                    return `
+                        <div class="image-preview-item" style="background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                            <i class="fas fa-file-pdf" style="font-size: 2rem; color: #dc2626;"></i>
+                            <span style="font-size: 0.7rem; margin-top: 5px;">${fileName.substring(0, 15)}...</span>
+                            <button class="image-preview-remove" onclick="removeImage(${index})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="image-preview-item">
+                        <img src="${imageData}" alt="Preview">
+                        <button class="image-preview-remove" onclick="removeImage(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
         }
         
         function removeImage(index) {
@@ -1990,7 +2228,14 @@
         // Save Vehicle
         // ========================================
         async function saveVehicle() {
+            // جمع الإكسسوارات المحددة
+            const accessories = [];
+            document.querySelectorAll('input[name="accessories"]:checked').forEach(cb => {
+                accessories.push(cb.value);
+            });
+            
             const data = {
+                // البيانات الأساسية
                 contractNo: document.getElementById('contractNo').value.trim(),
                 customerName: document.getElementById('customerName').value.trim(),
                 make: document.getElementById('make').value.trim(),
@@ -2007,7 +2252,29 @@
                 recoveryLocation: document.getElementById('recoveryLocation').value.trim(),
                 recommendation: document.getElementById('recommendation').value,
                 notes: document.getElementById('notes').value.trim(),
-                images: pendingImages,
+                
+                // ===== الحقول الإضافية للجرد v5.0 =====
+                warehouseId: document.getElementById('warehouseId')?.value || '',
+                operationalStatus: document.getElementById('operationalStatus')?.value || '',
+                fuelLevel: document.getElementById('fuelLevel')?.value || '',
+                keysStatus: document.getElementById('keysStatus')?.value || '',
+                tiresCondition: document.getElementById('tiresCondition')?.value || '',
+                batteryCondition: document.getElementById('batteryCondition')?.value || '',
+                insurancePolicy: document.getElementById('insurancePolicy')?.value?.trim() || '',
+                registrationExpiry: document.getElementById('registrationExpiry')?.value || '',
+                lastServiceDate: document.getElementById('lastServiceDate')?.value || '',
+                inventoryBy: document.getElementById('inventoryBy')?.value?.trim() || '',
+                technicalNotes: document.getElementById('technicalNotes')?.value?.trim() || '',
+                accessories: accessories,
+                inventoryDate: new Date().toISOString(),
+                
+                // تحويل الصور للتنسيق المناسب للحفظ
+                images: pendingImages.map(img => typeof img === 'object' ? img.data : img),
+                documents: pendingImages.filter(img => typeof img === 'object' && img.isPdf).map(img => ({
+                    data: img.data,
+                    name: img.name,
+                    uploadedAt: new Date().toISOString()
+                })),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
